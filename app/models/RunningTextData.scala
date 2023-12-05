@@ -12,7 +12,7 @@ import javax.inject.Inject
 case class RunningText(
   id: Long,
   description: String,
-  status: Boolean
+  status: Int = 1
 )
 class RunningTextData @Inject()(
                                  DBApi: DBApi,
@@ -28,11 +28,10 @@ class RunningTextData @Inject()(
     val query: String = "SELECT * FROM running_text WHERE status = 1 ;"
 
     val count =
-      """SELECT COUNT(*) FROM running_text
-        |WHERE status = 1 """.stripMargin
+      """SELECT COUNT(*) FROM running_text WHERE status = 1 """
     val total = SQL(count).as(scalar[Long].single)
 
-    val list = SQL(query).as(RunningTextParser.runningTextParser.*)
+    val list = SQL(query + limitation).as(RunningTextParser.runningTextParser.*)
 
     ListResult(list, page, Helpers.limit, total)
   }
@@ -41,6 +40,13 @@ class RunningTextData @Inject()(
     val query: String = s"SELECT * FROM running_text WHERE id = {id};"
 
     SQL(query).on("id" -> id).as(RunningTextParser.runningTextParser.singleOpt)
+  }
+
+  def insert(runningText: RunningText): (Option[Any], String) = db.withConnection{ implicit c =>
+    val data: Map[String, String] = Map (
+      "description" -> runningText.description,
+    )
+    Helpers.insertDB("running_text", data)
   }
 
   def update(runningText: RunningText):(Int, String) = db.withConnection {implicit c =>

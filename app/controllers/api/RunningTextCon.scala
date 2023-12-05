@@ -13,6 +13,14 @@ class RunningTextCon @Inject()(
                               ) extends AbstractController(cc){
 
   import runningTextData.runningTextFormat
+
+  def list(page: Int): Action[AnyContent] = Action {
+    val res: ListResult[RunningText] = runningTextData.list()
+
+    if (res.total > 0) {
+      Res.successWithPage[RunningText](res, page, "Running Text")
+    } else NoContent
+  }
   def get(id: Int): Action[AnyContent] = Action{implicit request: Request[AnyContent] =>
     val res: Option[RunningText] = runningTextData.get(id)
 
@@ -22,12 +30,23 @@ class RunningTextCon @Inject()(
     }
   }
 
-  def list(page: Int): Action[AnyContent] = Action {
-    val res: ListResult[RunningText] = runningTextData.list()
+  def add(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    val param = request.body.asJson.get
+    val description = (param \ "description").as[String]
 
-    if (res.total > 0) {
-      Res.successWithPage[RunningText](res, page, "Running Text")
-    } else NoContent
+    val runningText = RunningText(-1, description, 1)
+
+    val res = runningTextData.insert(runningText)
+    res match {
+      case (Some(data), _) =>
+        Res.created(
+          "Data running text berhasil ditambahkan.",
+          Json.obj("running_text_id" -> data.asInstanceOf[Long]))
+
+      case (None, message) => {
+          Res.badRequest(s"Data running text gagal ditambahkan.", message)
+        }
+    }
   }
 
   def put(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
@@ -55,16 +74,16 @@ class RunningTextCon @Inject()(
     }
   }
 
-//  def delete(menuId: Long): Action[AnyContent] = jwtAuth { implicit request =>
-//    val data: Map[String, String] = Map(
-//      "is_delete" -> "yes"
-//    )
-//    val res: (Int, String) = menuData.deleteMenuById(data, menuId)
-//    res match {
-//      case (1, "") => Res.success[JsValue]("Data menu berhasil dihapus.", Json.obj("deleted" -> 1))
-//      case (0, err) => Res.badRequest("Data menu gagal dihapus.", err)
-//    }
-//  }
+  def remove(): Action[AnyContent] = Action { implicit request =>
+    val param = request.body.asJson.get
+    val id = (param \ "id").as[Long]
+
+    val res: (Int, String) = runningTextData.delete(id)
+    res match {
+      case (1, "") => Res.success[JsValue]("Data running text berhasil dihapus.", Json.obj("deleted" -> 1))
+      case (0, err) => Res.badRequest("Data running text gagal dihapus.", err)
+    }
+  }
 
 
 }
