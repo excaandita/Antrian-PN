@@ -1,5 +1,28 @@
-@()
+<!DOCTYPE html>
+<html lang="en">
+    @views.html.layouts.header()
 
-@main("Welcome to Play") {
-  <h1>Welcome to Play!</h1>
-}
+    <body class="hold-transition sidebar-mini layout-fixed">
+        <div class="preloader flex-column justify-content-center align-items-center">
+          <img class="animation__shake" src="@routes.Assets.versioned("dist/img/AdminLTELogo.png")" alt="AdminLTELogo" height="60" width="60">
+        </div>
+
+        <!-- ./wrapper -->
+        <div class="wrapper">
+          @views.html.layouts.navbar()
+
+          @views.html.layouts.sidebar()
+
+          @views.html.pages.masterdata.dashboard()
+
+          @views.html.pages.masterdata.running_text()
+
+          @views.html.pages.masterdata.video()
+
+          @views.html.pages.antrian()
+        </div>
+        <!-- ./wrapper -->
+
+        @views.html.layouts.script_js()
+    </body>
+</html>
