@@ -1,3 +1,6 @@
+@import models.RunningTextData
+@(runningTextList: List[RunningText])
+
 <!DOCTYPE html>
 <html lang="en">
     @views.html.layouts.header()
@@ -20,6 +23,16 @@
           @views.html.pages.masterdata.video()
 
           @views.html.pages.antrian()
+        </div>
+        <div class="footer w-100"
+             style="background: #06a9f3; opacity:100%; color: #E8FBFF; font-size: 20px; position: fixed;bottom: 0;">
+            <marquee direction="" onmouseover="this.stop();" onmouseout="this.start();" scrollamount="5">
+                <div class="holder py-3">
+                    @for(message <- runningTextList) {
+                    <span class="text-container" style="font-weight: 400">@message.description</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    }
+                </div>
+            </marquee>
         </div>
         <!-- ./wrapper -->
 
