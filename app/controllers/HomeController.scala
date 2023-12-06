@@ -45,4 +45,13 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
   def queue(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.pages.antrian())
   }
+
+  def kiosk(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.boards.kiosk())
+  }
+
+  def display(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.boards.display())
+  }
+
 }
