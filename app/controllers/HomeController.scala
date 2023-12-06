@@ -28,8 +28,17 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
   def dashboard(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.pages.masterdata.dashboard())
   }
+
   def running_text():Action[AnyContent] = Action{ implicit request: Request[AnyContent]=>
     Ok(views.html.pages.masterdata.running_text())
+  }
+
+  def court_room(): Action[AnyContent] = Action { implicit request: Request[AnyContent]=>
+    Ok(views.html.pages.masterdata.court_room())
+  }
+
+  def video(): Action[AnyContent] = Action { implicit request: Request[AnyContent]=>
+    Ok(views.html.pages.masterdata.video())
   }
 
 //  ANTRIAN

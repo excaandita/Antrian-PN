@@ -8,8 +8,9 @@ GET     /                           controllers.HomeController.index()
 
 GET     /dashboard                  controllers.HomeController.dashboard()
 GET     /running_text               controllers.HomeController.running_text()
-
+GET     /court_room                 controllers.HomeController.court_room()
 GET     /queue                      controllers.HomeController.queue()
+GET     /video                      controllers.HomeController.video()
 
 # API
 GET     /api/running_text/get/:id           controllers.api.RunningTextCon.get(id:Int)
