@@ -6,6 +6,11 @@
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index()
 
+GET     /dashboard                  controllers.HomeController.dashboard()
+GET     /running_text               controllers.HomeController.running_text()
+
+GET     /queue                      controllers.HomeController.queue()
+
 # API
 GET     /api/running_text/get/:id           controllers.api.RunningTextCon.get(id:Int)
 GET     /api/running_text/list              controllers.api.RunningTextCon.list()

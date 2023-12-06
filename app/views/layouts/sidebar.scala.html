@@ -23,13 +23,13 @@
                with font-awesome or any other icon font library -->
         <!-- <li class="nav-item menu-open"> -->
         <li class="nav-item">
-            <a href="#" class="nav-link active">
+            <a class="nav-link active" onclick="show_page('dashboard', 'Dashboard','/dashboard','fas fa-tachometer-alt')">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>Dashboard</p>
             </a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link">
+          <a class="nav-link">
             <i class="nav-icon fas fa-database"></i>
             <p>
               Masterdata
@@ -38,19 +38,19 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="./index.html" class="nav-link">
+              <a class="nav-link">
                 <i class="far fa-building nav-icon"></i>
                 <p>Ruang Sidang</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="./index2.html" class="nav-link">
+              <a class="nav-link" onclick="show_page('masterdata', 'Running Text','/running_text','fa fa-align-right')">
                 <i class="fa fa-align-right nav-icon"></i>
                 <p>Running Text</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="./index3.html" class="nav-link">
+              <a class="nav-link">
                 <i class="far fa-file-video nav-icon"></i>
                 <p>Video</p>
               </a>
@@ -58,7 +58,7 @@
           </ul>
         </li>
         <li class="nav-item">
-          <a href="pages/widgets.html" class="nav-link">
+          <a class="nav-link" onclick="show_page('antrian', 'Antrian','/queue','fas fa-th')">
             <i class="nav-icon fas fa-th"></i>
             <p>
               Antrian
@@ -72,3 +72,42 @@
   </div>
   <!-- /.sidebar -->
 </aside>
+
+<script type="text/javascript">
+
+  function show_page(module, title, url, icon) {
+
+        localStorage.setItem("queue_menu", title);
+        localStorage.setItem("queue_menu_url", url);
+        localStorage.setItem("queue_module", module);
+        localStorage.setItem("queue_icon", icon);
+
+        //$('#page_title_icon').removeClass().addClass('fa '+icon);
+        $('#page_title').html(title);
+
+        $.ajax({
+          url: url,
+          cache: false,
+          success: function(data) {
+            $('#main-content').empty();
+            $('#main-content').html(data);
+          },
+          error: function(e){
+            console.log(e)
+            error_response(e)
+          }
+        });
+
+        var $ul = $('.nav.side-menu');
+        console.log($('body').hasClass('nav-sm'))
+        if ($('body').hasClass('nav-sm') && $ul.find($('li.active')).length) {
+            var $active_li = $ul.find($('li.active'))
+            $($active_li.children()[1]).slideUp();
+            $active_li.removeClass('active');
+        }
+    }
+
+    function gotohome() {
+      show_page('', 'Home' ,'home', 'fa-home');
+    }
+</script>

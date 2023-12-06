@@ -1,8 +1,9 @@
 package controllers
 
-import javax.inject._
 import play.api._
 import play.api.mvc._
+
+import javax.inject._
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -18,7 +19,21 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-  def index() = Action { implicit request: Request[AnyContent] =>
+  def index(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.index())
+  }
+
+
+//  MASTERDATA
+  def dashboard(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.pages.masterdata.dashboard())
+  }
+  def running_text():Action[AnyContent] = Action{ implicit request: Request[AnyContent]=>
+    Ok(views.html.pages.masterdata.running_text())
+  }
+
+//  ANTRIAN
+  def queue(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.pages.antrian())
   }
 }
