@@ -74,9 +74,8 @@
 </aside>
 
 <script type="text/javascript">
-
   function show_page(module, title, url, icon) {
-
+  // TODO: need to improve parameter and variable to set on local storage
         localStorage.setItem("queue_menu", title);
         localStorage.setItem("queue_menu_url", url);
         localStorage.setItem("queue_module", module);
@@ -99,7 +98,7 @@
         });
 
         var $ul = $('.nav.side-menu');
-        console.log($('body').hasClass('nav-sm'))
+        //console.log($('body').hasClass('nav-sm'))
         if ($('body').hasClass('nav-sm') && $ul.find($('li.active')).length) {
             var $active_li = $ul.find($('li.active'))
             $($active_li.children()[1]).slideUp();

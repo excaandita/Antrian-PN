@@ -21,17 +21,22 @@ class RunningTextData @Inject()(
 
   implicit val runningTextFormat: OFormat[RunningText] = Json.format[RunningText]
 
-  def list(page: Int = 0): ListResult[RunningText] = db.withConnection{ implicit c =>
+  def list(page: Int = 0, active: String = "active"): ListResult[RunningText] = db.withConnection{ implicit c =>
     val startRow = Helpers.start(page)
     val limitation = (if (page > 0) s" LIMIT ${Helpers.limit} OFFSET ${startRow} " else "")
 
-    val query: String = "SELECT * FROM running_text WHERE status = 1 ;"
+    val is_active: String = active match {
+      case "active" => " WHERE status = 1 "
+      case "inactive" => " WHERE status = 0 "
+      case _ => " "
+    }
 
-    val count =
-      """SELECT COUNT(*) FROM running_text WHERE status = 1 """
-    val total = SQL(count).as(scalar[Long].single)
+    val query: String = "SELECT * FROM running_text "
 
-    val list = SQL(query + limitation).as(RunningTextParser.runningTextParser.*)
+    val count = "SELECT COUNT(*) FROM running_text "
+    val total = SQL(count + is_active).as(scalar[Long].single)
+
+    val list = SQL(query + is_active + limitation).as(RunningTextParser.runningTextParser.*)
 
     ListResult(list, page, Helpers.limit, total)
   }
