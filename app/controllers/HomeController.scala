@@ -23,10 +23,30 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
    */
   def index(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     val running_text_list: List[RunningText] = runningTextData.list().items
+
     Ok(views.html.index(running_text_list))
   }
 
-  def runningText(): Action[AnyContent] = Action {
+
+//  MASTERDATA
+  def dashboard(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.pages.masterdata.dashboard())
+  }
+
+  def runningText():Action[AnyContent] = Action{ implicit request: Request[AnyContent]=>
     Ok(views.html.pages.masterdata.running_text())
+  }
+
+  def courtRoom(): Action[AnyContent] = Action { implicit request: Request[AnyContent]=>
+    Ok(views.html.pages.masterdata.court_room())
+  }
+
+  def video(): Action[AnyContent] = Action { implicit request: Request[AnyContent]=>
+    Ok(views.html.pages.masterdata.video())
+  }
+
+//  ANTRIAN
+  def queue(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.pages.antrian())
   }
 }

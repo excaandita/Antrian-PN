@@ -7,6 +7,12 @@
 GET     /                           controllers.HomeController.index()
 GET     /running_text               controllers.HomeController.runningText()
 
+GET     /dashboard                  controllers.HomeController.dashboard()
+GET     /running_text               controllers.HomeController.runningText()
+GET     /court_room                 controllers.HomeController.courtRoom()
+GET     /queue                      controllers.HomeController.queue()
+GET     /video                      controllers.HomeController.video()
+
 # API
 GET     /api/running_text/get/:id           controllers.api.RunningTextCon.get(id:Int)
 GET     /api/running_text/list/:p           controllers.api.RunningTextCon.list(p: Int)

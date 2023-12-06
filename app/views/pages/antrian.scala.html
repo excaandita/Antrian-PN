@@ -7,13 +7,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Ruang Sidang</h1>
+            <h1 class="m-0">Pemanggilan Antrian</h1>
           </div>
           <!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Masterdata</a></li>
-              <li class="breadcrumb-item active">Ruang Sidang</li>
+              <li class="breadcrumb-item active"><a href="#">Antrian</a></li>
             </ol>
           </div>
           <!-- /.col -->
@@ -29,44 +28,68 @@
         <div class="container-fluid">
             <!-- Main row -->
             <div class="row">
-                <section class="col-lg-12">
+                <section class="col-lg-6">
                     <div class="card card-primary">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-bullhorn"></i> &nbsp; Antrian
+                                <i class="fas fa-bullhorn"></i> &nbsp; <b>Antrian</b>
                             </h3>
                         </div>
                 
                         <div class="card-body">
-                            <div class="callout callout-danger">
-                                <h5>I am a danger callout!</h5>
-                                <p>There is a problem that we need to fix. A wonderful serenity has taken possession of my entire
-                                soul,
-                                like these sweet mornings of spring which I enjoy with my whole heart.</p>
-                            </div>
-                            <div class="callout callout-info">
-                                <h5>I am an info callout!</h5>
-                                <p>Follow the steps to continue to payment.</p>
-                            </div>
-                            <div class="callout callout-warning">
-                                <h5>I am a warning callout!</h5>
-                                <p>This is a yellow callout.</p>
-                            </div>
-                            <div class="callout callout-success">
-                                <h5>I am a success callout!</h5>
-                                <p>This is a green callout.</p>
-                            </div>
+                            <form>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label>Ruang Sidang</label>
+                                            <select class="form-control">
+                                                <option value="">Ruang Sidang 1 Pidana</option>
+                                                <option value="">Ruang Sidang 2 Pidana</option>
+                                                <option value="">Ruang Sidang 3 Hukum</option>
+                                                <option value="">Ruang Sidang 4 Perdata</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2"></div>
+                                    <div class="col-sm-8">
+                                        <div class="small-box bg-success">
+                                            <div class="inner text-center">
+                                                <p style="font-weight: bolder;">Antrian Saat Ini</p>
+                                                <p style="font-size: 70px; font-weight: bolder;">0</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-danger form-control"><i class="fas fa-backward"></i>&nbsp; Sebelumnya</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-warning form-control"><i class="fas fa-pause-circle"></i>&nbsp; Sekarang</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-info form-control">Selanjutnya &nbsp;<i class="fas fa-forward"></i></button>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </form>
+
                         </div>
                     </div>
                 </section>
-            </div>
-
-            <div class="row">
-                <section class="col-lg-12">
-                    <div class="card card-success">
+                <section class="col-lg-6">
+                    <div class="card card-primary">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-bullhorn"></i> &nbsp; Panggil Antrian Tertentu
+                                <i class="fas fa-bullhorn"></i> &nbsp; <b>Panggil Antrian Tertentu</b>
                             </h3>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
@@ -76,27 +99,48 @@
                         </div>
                 
                         <div class="card-body">
-                            <div class="callout callout-danger">
-                                <h5>I am a danger callout!</h5>
-                                <p>There is a problem that we need to fix. A wonderful serenity has taken possession of my entire
-                                soul,
-                                like these sweet mornings of spring which I enjoy with my whole heart.</p>
-                            </div>
-                            <div class="callout callout-info">
-                                <h5>I am an info callout!</h5>
-                                <p>Follow the steps to continue to payment.</p>
-                            </div>
-                            <div class="callout callout-warning">
-                                <h5>I am a warning callout!</h5>
-                                <p>This is a yellow callout.</p>
-                            </div>
-                            <div class="callout callout-success">
-                                <h5>I am a success callout!</h5>
-                                <p>This is a green callout.</p>
-                            </div>
+                            <form>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Ruang Sidang</label>
+                                            <select class="form-control">
+                                                <option value="">Ruang Sidang 1 Pidana</option>
+                                                <option value="">Ruang Sidang 2 Pidana</option>
+                                                <option value="">Ruang Sidang 3 Hukum</option>
+                                                <option value="">Ruang Sidang 4 Perdata</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Total Antrian</label>
+                                            <input type="text" class="form-control-plaintext" placeholder="-" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Nomor Antrian</label>
+                                            <input type="number" class="form-control" placeholder="Masukan Nomor antrian yang ingin dipanggil">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <div class="form-group">
+                                            <label>Panggil</label>
+                                            <button type="submit" class="btn btn-success form-control"><i class="fas fa-volume-up"></i></button>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </form>
                         </div>
                     </div>
                 </section>
+            </div>
+
+            <div class="row">
+                
             </div>
         </div>
       <!-- /.container-fluid -->
