@@ -22,7 +22,7 @@
         <div class="footer w-100"
              style="background: #06a9f3; opacity:100%; color: #E8FBFF; font-size: 20px; position: fixed;bottom: 0;">
             <marquee direction="" onmouseover="this.stop();" onmouseout="this.start();" scrollamount="5">
-                <div class="holder py-3">
+                <div class="holder py-2">
                     @for(message <- runningTextList) {
                     <span class="text-container" style="font-weight: 400">@message.description</span>&nbsp;&nbsp;&nbsp;&nbsp;
                     }
@@ -32,5 +32,21 @@
         <!-- ./wrapper -->
 
         @views.html.layouts.script_js()
+        <script type="text/javascript">
+            $(function(){
+              const queue_module = localStorage.getItem("queue_module");
+              const queue_menu = localStorage.getItem("queue_menu");
+              const queue_menu_url = localStorage.getItem("queue_menu_url");
+              const queue_icon = localStorage.getItem("queue_icon")
+
+              if ((queue_menu_url !== null) && (queue_menu_url !== '')) {
+                show_page(queue_module, queue_menu, queue_menu_url, queue_icon);
+              }else{
+                show_page('', 'Dashboard' ,'home', 'fa-home');
+              }
+                // End of Function ;
+
+            });
+        </script>
     </body>
 </html>

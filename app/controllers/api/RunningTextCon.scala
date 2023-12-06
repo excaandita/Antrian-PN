@@ -3,7 +3,7 @@ package controllers.api
 import models.{RunningText, RunningTextData}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
-import utils.{ListResult, ResponseService => Res}
+import utils.{Helpers, ListResult, ResponseService => Res}
 
 import javax.inject.Inject
 
@@ -14,14 +14,16 @@ class RunningTextCon @Inject()(
 
   import runningTextData.runningTextFormat
 
-  def list(page: Int): Action[AnyContent] = Action {
-    val res: ListResult[RunningText] = runningTextData.list()
+  def list(page: Int): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+
+    val active: String = Helpers.getData(request, "active")
+    val res: ListResult[RunningText] = runningTextData.list(page, active)
 
     if (res.total > 0) {
       Res.successWithPage[RunningText](res, page, "Running Text")
     } else NoContent
   }
-  def get(id: Int): Action[AnyContent] = Action{implicit request: Request[AnyContent] =>
+  def get(id: Int): Action[AnyContent] = Action{
     val res: Option[RunningText] = runningTextData.get(id)
 
     res match {

@@ -23,11 +23,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
    */
   def index(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     val running_text_list: List[RunningText] = runningTextData.list().items
-    Ok(views.html.index(running_text_list))
-  }
 
-  def runningText(): Action[AnyContent] = Action {
-    Ok(views.html.pages.masterdata.running_text())
+    Ok(views.html.index(running_text_list))
   }
 
 
@@ -36,11 +33,11 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
     Ok(views.html.pages.masterdata.dashboard())
   }
 
-  def running_text():Action[AnyContent] = Action{ implicit request: Request[AnyContent]=>
+  def runningText():Action[AnyContent] = Action{ implicit request: Request[AnyContent]=>
     Ok(views.html.pages.masterdata.running_text())
   }
 
-  def court_room(): Action[AnyContent] = Action { implicit request: Request[AnyContent]=>
+  def courtRoom(): Action[AnyContent] = Action { implicit request: Request[AnyContent]=>
     Ok(views.html.pages.masterdata.court_room())
   }
 

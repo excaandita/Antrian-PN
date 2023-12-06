@@ -8,8 +8,8 @@ GET     /                           controllers.HomeController.index()
 GET     /running_text               controllers.HomeController.runningText()
 
 GET     /dashboard                  controllers.HomeController.dashboard()
-GET     /running_text               controllers.HomeController.running_text()
-GET     /court_room                 controllers.HomeController.court_room()
+GET     /running_text               controllers.HomeController.runningText()
+GET     /court_room                 controllers.HomeController.courtRoom()
 GET     /queue                      controllers.HomeController.queue()
 GET     /video                      controllers.HomeController.video()
 
@@ -17,8 +17,8 @@ GET     /kiosk                      controllers.HomeController.kiosk()
 GET     /display                    controllers.HomeController.display()
 
 # API
-GET     /api/running_text/get/:id           controllers.api.RunningTextCon.get(id:Int)
 GET     /api/running_text/list/:p           controllers.api.RunningTextCon.list(p: Int)
+GET     /api/running_text/get/:id           controllers.api.RunningTextCon.get(id:Int)
 POST    /api/running_text/insert            controllers.api.RunningTextCon.add()
 PUT     /api/running_text/update            controllers.api.RunningTextCon.put()
 DELETE  /api/running_text/delete            controllers.api.RunningTextCon.remove()
