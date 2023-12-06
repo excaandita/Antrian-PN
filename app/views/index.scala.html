@@ -5,7 +5,7 @@
 <html lang="en">
     @views.html.layouts.header()
 
-    <body class="hold-transition sidebar-mini layout-fixed">
+    <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
         <div class="preloader flex-column justify-content-center align-items-center">
           <img class="animation__shake" src="@routes.Assets.versioned("dist/img/AdminLTELogo.png")" alt="AdminLTELogo" height="60" width="60">
         </div>
@@ -15,14 +15,9 @@
           @views.html.layouts.navbar()
 
           @views.html.layouts.sidebar()
+            <div id="main-content">
 
-          @views.html.pages.masterdata.dashboard()
-
-          @views.html.pages.masterdata.running_text()
-
-          @views.html.pages.masterdata.video()
-
-          @views.html.pages.antrian()
+            </div>
         </div>
         <div class="footer w-100"
              style="background: #06a9f3; opacity:100%; color: #E8FBFF; font-size: 20px; position: fixed;bottom: 0;">

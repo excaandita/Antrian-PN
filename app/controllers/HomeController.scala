@@ -29,4 +29,36 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
   def runningText(): Action[AnyContent] = Action {
     Ok(views.html.pages.masterdata.running_text())
   }
+
+
+//  MASTERDATA
+  def dashboard(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.pages.masterdata.dashboard())
+  }
+
+  def running_text():Action[AnyContent] = Action{ implicit request: Request[AnyContent]=>
+    Ok(views.html.pages.masterdata.running_text())
+  }
+
+  def court_room(): Action[AnyContent] = Action { implicit request: Request[AnyContent]=>
+    Ok(views.html.pages.masterdata.court_room())
+  }
+
+  def video(): Action[AnyContent] = Action { implicit request: Request[AnyContent]=>
+    Ok(views.html.pages.masterdata.video())
+  }
+
+//  ANTRIAN
+  def queue(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.pages.antrian())
+  }
+
+  def kiosk(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.boards.kiosk())
+  }
+
+  def display(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.boards.display())
+  }
+
 }

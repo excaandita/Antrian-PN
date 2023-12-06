@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Antrian PN | Login</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"/>
+    <link rel="stylesheet" href='https://fonts.googleapis.com/css?family=Poppins'>
+    <link rel="stylesheet" href="@routes.Assets.versioned("plugins/fontawesome-free/css/all.min.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned("plugins/icheck-bootstrap/icheck-bootstrap.min.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned("dist/css/adminlte.min.css?v=3.2.0")" />
+
+    <style>
+        * {
+            font-family: 'Poppins';
+            padding: 0;
+        }
+
+        .font-primary{
+            color: #053B50;
+        }
+
+        .tanggal_terkini {
+            color: #053B50;
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .jam_terkini {
+            color: #053B50;
+            font-size: 36px;
+            font-weight: 900;
+        }
+
+        .container {
+            /* background-color: paleturquoise; */
+            padding: 1.4rem 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .item {
+            flex: 0 0 calc(25% - 2%);
+            color: white;
+            padding: 20px;
+            margin: 5px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            border-style: solid;
+            border-width: 2px;
+            border-color: #152c581a; 
+        }
+
+        .item:hover {
+            background-color: #F0F3FD;
+        }
+
+        .item:active {
+            background-color: #D3DBF9;
+        }
+
+        .ic-ruang-sidang {
+            width: 5.2rem;
+            height: 5.2rem;
+            text-align: center;
+            display: block;
+            margin: 0 auto 1rem auto;
+            cursor: pointer;
+
+            font-family: Poppins;
+            font-size: 90px; 
+            font-style: normal; 
+            font-weight: 1000; 
+            line-height: 111%;  
+            background: linear-gradient(180deg, #053B50 23.96%, #04ADF5 86.98%); 
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nama-ruang-sidang {
+            background-color: #176B87;
+            font-style: normal;
+            font-weight: 700;
+            font-size: 17px;
+            line-height: 33px;
+            cursor: pointer;
+            color: white;
+            border: solid #3252DF 0.7px;
+            border-radius: 12px;
+            width: 100%;
+            padding: 0 5px;
+            display: block;
+            margin: 30px auto 0 auto;
+        }
+        
+        .no-antri,
+        .sisa-antrian {
+            font-style: normal;
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 33px;
+            color: #152C58;
+        }
+
+        .sisa-antrian {
+            margin-top: -2.5%;
+        }
+    </style>
+  </head>
+  <body class="hold-transition">
+    <div class="content px-5">
+        <!-- Navbar -->
+        <nav class="navbar d-flex justify-content-between align-item-center py-3">
+            <!-- Logo and Company -->
+            <div class="col-md-4">
+                <div class="logo-header d-flex align-items-center">
+                    <img src="@routes.Assets.versioned("images/logo_pn.png")" style="width: 65px; margin-right: 24px" alt="logo">
+                    <span class="mt-3 mb-2 text-uppercase font-primary" style="width: 60%; font-weight: 900; font-size: 27px;">Pengadilan Negeri Jakarta Utara</span>
+                </div>
+            </div>
+            <!-- datetime Clock -->
+            <div class="col-md-4">
+                <div class="text-right">
+                    <div class="tanggal_terkini" id="tanggal_terkini">Ahad, 01 Januari 1970</div> 
+                    <div class="jam_terkini" id="jam_terkini">00:00:00</div>  
+                </div>
+            </div>
+        </nav>
+        <section class="content-header">
+            <div class="row mb-2">
+                <div class="col-sm-12 text-center">
+                    <span class="font-primary" style="width: 100%; font-weight: 900; font-size: 24px;">Silahkan Pilih! Ambil Nomor Antrian.</span>
+                </div>
+            </div>
+        </section>
+        <section class="container">
+            <div class="item">
+                <div class="example1">
+                    <div class="ic-ruang-sidang">A</div>
+                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
+                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
+                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="example1">
+                    <div class="ic-ruang-sidang">B</div>
+                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
+                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
+                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="example1">
+                    <div class="ic-ruang-sidang">C</div>
+                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
+                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
+                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="example1">
+                    <div class="ic-ruang-sidang">D</div>
+                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
+                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
+                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="example1">
+                    <div class="ic-ruang-sidang">E</div>
+                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
+                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
+                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="example1">
+                    <div class="ic-ruang-sidang">F</div>
+                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
+                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
+                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="example1">
+                    <div class="ic-ruang-sidang">G</div>
+                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
+                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
+                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-footer text-center" style="font-size: 12px; font-weight: 300;">
+            <center>
+				<b style="font-style: normal; font-weight: 300; line-height: 20px; color: #152C58;">Antrian Pelayanan. Pengadilan Negeri Jakarta Utara<br>
+				© 2023. All rights reserved.
+			</center>
+        </section>
+    </div>
+    
+    <script src="@routes.Assets.versioned("plugins/jquery/jquery.min.js")"></script>
+    <script src="@routes.Assets.versioned("plugins/bootstrap/js/bootstrap.bundle.min.js")"></script>
+    <script src="@routes.Assets.versioned("dist/js/adminlte.min.js?v=3.2.0")"></script>
+
+    <script type="text/javascript">
+        var templatePlugins = function(){
+            var tp_clock = function(){
+                function tp_clock_time(){
+                    var now     = new Date();
+                    var hour    = now.getHours();
+                    var minutes = now.getMinutes();
+                    var seconds = now.getSeconds();;                    
+                    
+                    hour = hour < 10 ? '0'+hour : hour;
+                    minutes = minutes < 10 ? '0'+minutes : minutes;
+                    seconds = seconds < 10 ? '0'+seconds : seconds;
+                    
+                    $("#jam_terkini").html(hour+"<span>:</span>"+minutes+"<span>:</span>"+seconds);
+                }
+                if($("#jam_terkini").length > 0){
+                    
+                    tp_clock_time();
+                    
+                    window.setInterval(function(){
+                        tp_clock_time();                    
+                    },100);
+                    
+                }
+            }
+            
+            var tp_date = function(){
+                
+                if($("#tanggal_terkini").length > 0){
+                    
+                    var days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jum'at","Sabtu"];
+                    var months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+                            
+                    var now     = new Date();
+                    var day     = days[now.getDay()];
+                    var date    = now.getDate();
+                    var month   = months[now.getMonth()];
+                    var year    = now.getFullYear();
+                    
+                    $("#tanggal_terkini").html(day+", "+date+" "+month+" "+year);
+                }
+                
+            }
+            
+            return {
+                init: function(){
+                    tp_clock();
+                    tp_date();
+                }
+            }
+        }();
+
+        $(document).ready(function() {
+            templatePlugins.init();
+        });
+    </script>
+  </body>
+</html>
+
