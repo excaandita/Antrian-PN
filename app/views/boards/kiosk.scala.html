@@ -1,3 +1,5 @@
+@(courtRoomList: List[CourtRoom])
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -139,68 +141,16 @@
             </div>
         </section>
         <section class="container">
-            <div class="item">
-                <div class="example1">
-                    <div class="ic-ruang-sidang">A</div>
-                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
-                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
-                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
+            @for(v <- courtRoomList) {
+                <div class="item">
+                    <div class="example1">
+                        <div class="ic-ruang-sidang">@v.name</div>
+                        <div class="nama-ruang-sidang">@v.description</div>
+                        <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
+                        <div class="sisa-antrian"> Sisa Antrian: 10</div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="item">
-                <div class="example1">
-                    <div class="ic-ruang-sidang">B</div>
-                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
-                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
-                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="example1">
-                    <div class="ic-ruang-sidang">C</div>
-                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
-                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
-                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="example1">
-                    <div class="ic-ruang-sidang">D</div>
-                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
-                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
-                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="example1">
-                    <div class="ic-ruang-sidang">E</div>
-                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
-                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
-                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="example1">
-                    <div class="ic-ruang-sidang">F</div>
-                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
-                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
-                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="example1">
-                    <div class="ic-ruang-sidang">G</div>
-                    <div class="nama-ruang-sidang">Ruang Sidang 1</div>
-                    <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
-                    <div class="sisa-antrian"> Sisa Antrian: 10</div>
-                </div>
-            </div>
+            }
         </section>
 
         <section class="content-footer text-center" style="font-size: 12px; font-weight: 300;">

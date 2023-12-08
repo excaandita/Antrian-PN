@@ -24,7 +24,7 @@ class CourtRoomData @Inject()(
 
   implicit val courtRoomFormat: OFormat[CourtRoom] = Json.format[CourtRoom]
 
-  def list(page: Int = 0, active: String = "active"): ListResult[CourtRoom] = db.withConnection{ implicit c =>
+  def list(page: Int = 0, active: String = "active", order: String = "list"): ListResult[CourtRoom] = db.withConnection{ implicit c =>
     val startRow = Helpers.start(page)
     val limitation = (if (page > 0) s" LIMIT ${Helpers.limit} OFFSET ${startRow} " else "")
 
@@ -34,12 +34,18 @@ class CourtRoomData @Inject()(
       case _ => " "
     }
 
+    val is_order: String = order match {
+      case "list" => " order by id asc "
+      case "kiosk" => " order by name asc "
+      case _ => " "
+    }
+
     val query: String = "SELECT * FROM court_room "
 
     val count = "SELECT COUNT(*) FROM court_room "
     val total = SQL(count + is_active).as(scalar[Long].single)
 
-    val list = SQL(query + is_active + limitation).as(CourtRoomParser.courtRoomParser.*)
+    val list = SQL(query + is_active + is_order + limitation).as(CourtRoomParser.courtRoomParser.*)
 
     ListResult(list, page, Helpers.limit, total)
   }
