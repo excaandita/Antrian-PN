@@ -65,4 +65,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
     Ok(views.html.boards.display(running_text_list))
   }
 
+  def cetak(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.printing.cetak_antrian())
+  }
+
 }

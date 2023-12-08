@@ -16,6 +16,8 @@ GET     /video                      controllers.HomeController.video()
 GET     /kiosk                      controllers.HomeController.kiosk()
 GET     /display                    controllers.HomeController.display()
 
+GET     /cetak_antrian              controllers.HomeController.cetak()
+
 # API
 GET     /api/running_text/list/:p           controllers.api.RunningTextCon.list(p: Int)
 GET     /api/running_text/get/:id           controllers.api.RunningTextCon.get(id:Int)
