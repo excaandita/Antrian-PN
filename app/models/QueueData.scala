@@ -19,9 +19,20 @@ case class Queue(
                   pick_up_time: js.Timestamp,
                   status: Int = 0
                     )
+case class QueueJoin(
+                  id: Long,
+                  date: ju.Date,
+                  queue_number: Int,
+                  id_court_room: Long,
+                  court_room: Option[CourtRoom],
+                  call_time: Option[js.Timestamp],
+                  pick_up_time: js.Timestamp,
+                  status: Int = 0
+                    )
 
 class QueueData @Inject()(
                                  DBApi: DBApi,
+                                 courtRoomData: CourtRoomData
                                ) {
   private val db = DBApi.database("antrian_pn")
 
@@ -36,6 +47,9 @@ class QueueData @Inject()(
   }
 
   implicit val queueFormat: OFormat[Queue] = Json.format[Queue]
+
+  import courtRoomData.courtRoomFormat
+  implicit val queueJoinFormat: OFormat[QueueJoin] = Json.format[QueueJoin]
 
   def list(page: Int = 0, active: String = "active"): ListResult[Queue] = db.withConnection{ implicit c =>
     val startRow = Helpers.start(page)
@@ -57,10 +71,24 @@ class QueueData @Inject()(
     ListResult(list, page, Helpers.limit, total)
   }
 
-  def get(id: Int): Option[Queue] = db.withConnection { implicit c =>
-    val query: String = s"SELECT * FROM queue WHERE id = {id};"
+  def get(id: Long): Option[QueueJoin] = db.withConnection { implicit c =>
+    val query: String =
+      """
+        |SELECT * FROM queue q
+        |JOIN court_room cr
+        |ON (q.id_court_room = cr.id)
+        |WHERE q.id = {id} """.stripMargin
 
-    SQL(query).on("id" -> id).as(QueueParser.queueParser.singleOpt)
+    SQL(query).on("id" -> id).as(QueueParser.queueJoinParser.singleOpt)
+  }
+
+  def getQueueLeft(idCourtRoom: Long, date: String): Int = db.withConnection { implicit c =>
+    val query: String =
+      """
+        |SELECT COUNT(status) FROM queue q
+        |WHERE q.id_court_room = {idCourtRoom} AND date = {date} AND status = 'no' """.stripMargin
+
+    SQL(query).on("idCourtRoom" -> idCourtRoom, "date" -> date).as(scalar[Int].single)
   }
 
   def getQueue(idCourtRoom: Long, date: String): Option[Int] = db.withConnection{implicit c =>

@@ -1,6 +1,7 @@
 package controllers.api
 
-import models.{Queue, QueueData}
+import models.{CourtRoomData, Queue, QueueData, QueueJoin}
+import play.api.libs.json.Json
 import play.api.mvc._
 import utils.{Helpers, ListResult, ResponseService => Res}
 
@@ -8,9 +9,13 @@ import java.{sql => js, util => ju}
 import javax.inject.Inject
 
 class QueueCon @Inject()(cc: ControllerComponents,
-                         queueData: QueueData
+                         queueData: QueueData,
+                         courtRoomData: CourtRoomData
                         ) extends AbstractController(cc){
   import queueData.queueFormat
+
+  import courtRoomData.courtRoomFormat
+  import queueData.queueJoinFormat
 
   def list(page: Int): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
 
@@ -22,10 +27,10 @@ class QueueCon @Inject()(cc: ControllerComponents,
     } else NoContent
   }
   def get(id: Int): Action[AnyContent] = Action{
-    val res: Option[Queue] = queueData.get(id)
+    val res: Option[QueueJoin] = queueData.get(id)
 
     res match {
-      case Some(res) => Res.success[Queue]("Berhasil mendapatkan data queue.", res)
+      case Some(res) => Res.success[QueueJoin]("Berhasil mendapatkan data queue.", res)
       case None => Res.notFound("Data queue tidak ditemukan.")
     }
   }
@@ -64,19 +69,34 @@ class QueueCon @Inject()(cc: ControllerComponents,
 //  Insert data queue
     val res = {
       queueData.insert(queue) match {
-        case (Some(data), _) => data.asInstanceOf[Int]
+        case (Some(data), _) => ("", data.asInstanceOf[Long])
         case (None, message) =>
           println(message)
-          -1
+          (message, -1.asInstanceOf[Long])
       }
     }
 
 //    res greater than 0 means the insert is success
-    if(res  > 0){
-      queueData.get(res)
+    if(res._2 > 0){
+      val getQueue: Option[QueueJoin] = queueData.get(res._2)
+
+//      count queue left
+      val queueLeft: Int = queueData.getQueueLeft(idCourtRoom, Helpers.date2String(now, "yyyy-MM-dd"))
+
+      if(getQueue.isDefined){
+        Res.created("Data queue berhasil ditambahkan",
+          Json.obj(
+            "queue" -> getQueue.get.queue_number,
+            "date_now" -> getQueue.get.pick_up_time,
+            "court_room" -> getQueue.get.court_room.get,
+            "queue_left" -> queueLeft
+          )
+        )
+      }else{
+       Ok("")
+      }
+    }else{
+      Res.badRequest("Data queue gagal ditambahkan", res._1)
     }
-    Ok("")
-
-
   }
 }

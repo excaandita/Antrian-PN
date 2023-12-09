@@ -3,7 +3,7 @@ package parser
 import anorm._
 import anorm.SqlParser._
 import anorm.{Column, MetaDataItem, RowParser, TypeDoesNotMatch}
-import models.Queue
+import models.{Queue, QueueJoin}
 
 import java.time.LocalDateTime
 import java.{sql => js, util => ju}
@@ -36,19 +36,20 @@ object QueueParser {
   }
 
 //  parser with join table id_court_room
-  val queueParserFull: RowParser[Queue] = {
+  val queueJoinParser: RowParser[QueueJoin] = {
     get[Long]("id") ~
       get[ju.Date]("date") ~
       get[Int]("queue_number") ~
       get[Long]("id_court_room") ~
+      CourtRoomParser.courtRoomParser.? ~
       get[Option[LocalDateTime]]("call_time") ~
       get[LocalDateTime]("pick_up_time") ~
       get[Int]("status") map {
-      case id ~ date ~ queue_number ~ id_court_room ~ call_time ~ pick_up_time ~ status =>
+      case id ~ date ~ queue_number ~ id_court_room ~ court_room ~ call_time ~ pick_up_time ~ status =>
 
         val call_time_validation = if(call_time.isDefined) Some(js.Timestamp.valueOf(call_time.get)) else None
 
-        Queue(id, date, queue_number, id_court_room, call_time_validation, js.Timestamp.valueOf(pick_up_time), status)
+        QueueJoin(id, date, queue_number, id_court_room, court_room, call_time_validation, js.Timestamp.valueOf(pick_up_time), status)
     }
   }
 }
