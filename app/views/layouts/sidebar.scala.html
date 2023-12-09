@@ -9,7 +9,7 @@
   </a>
 
   <!-- Sidebar -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
 
     <!-- Sidebar Menu -->
     <nav class="mt-2">
@@ -23,7 +23,7 @@
                with font-awesome or any other icon font library -->
         <!-- <li class="nav-item menu-open"> -->
         <li class="nav-item">
-            <a class="nav-link active" onclick="show_page('dashboard', 'Dashboard','/dashboard','fas fa-tachometer-alt')">
+            <a class="nav-link active" onclick="show_page('', 'Dashboard','/dashboard','fas fa-tachometer-alt')">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>Dashboard</p>
             </a>
@@ -31,14 +31,12 @@
         <li class="nav-item">
           <a class="nav-link">
             <i class="nav-icon fas fa-database"></i>
-            <p>
-              Masterdata
-              <i class="right fas fa-angle-left"></i>
+            <p id="masterdata">Masterdata<i class="right fas fa-angle-left"></i>
             </p>
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a class="nav-link" onclick="show_page('masterdaata', 'Ruang Sidang', '/court_room', 'fa fa-align-right')">
+              <a class="nav-link" onclick="show_page('masterdata', 'Ruang Sidang', '/court_room', 'fa fa-align-right')">
                 <i class="far fa-building nav-icon"></i>
                 <p>Ruang Sidang</p>
               </a>
@@ -58,7 +56,7 @@
           </ul>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="show_page('antrian', 'Antrian','/queue','fas fa-th')">
+          <a class="nav-link" onclick="show_page('', 'Antrian','/queue','fas fa-th')">
             <i class="nav-icon fas fa-th"></i>
             <p>
               Antrian
@@ -97,13 +95,29 @@
           }
         });
 
-        var $ul = $('.nav.side-menu');
-        //console.log($('body').hasClass('nav-sm'))
-        if ($('body').hasClass('nav-sm') && $ul.find($('li.active')).length) {
-            var $active_li = $ul.find($('li.active'))
-            $($active_li.children()[1]).slideUp();
-            $active_li.removeClass('active');
+        let $ul = $('#sidebar')
+        $ul.find($('li a.active').removeClass('active'))
+        if(!module){
+          const menuOpen = $ul.find($('li.menu-open'))
+          //menuOpen.find($('ul')).hide(500)
+          menuOpen.find($('ul')).slideUp()
+          menuOpen.removeClass('menu-is-opening')
+          menuOpen.removeClass('menu-open')
+        }else{
+          console.log($('ul.nav-treeview').siblings().find($(`p#${module}`)).parents('li').addClass('menu-is-opening menu-open'))
         }
+
+        // add active class
+        const navItems = $ul.find($('li.nav-item'))
+            navItems.find($(`p:contains(${title})`)).parent().addClass('active')
+
+        //var $ul = $('.nav.side-menu');
+        //console.log($('body').hasClass('nav-sm'))
+        //if ($('body').hasClass('nav-sm') && $ul.find($('li.active')).length) {
+          //  var $active_li = $ul.find($('li.active'))
+            //$($active_li.children()[1]).slideUp();
+            //$active_li.removeClass('active');
+        //}
     }
 
     function gotohome() {
