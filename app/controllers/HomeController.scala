@@ -1,6 +1,7 @@
 package controllers
 
 import models.{RunningText, RunningTextData}
+import models.{CourtRoom, CourtRoomData}
 import play.api._
 import play.api.mvc._
 
@@ -12,7 +13,9 @@ import javax.inject._
  */
 @Singleton
 class HomeController @Inject()(val controllerComponents: ControllerComponents,
-                               runningTextData: RunningTextData) extends BaseController {
+                               runningTextData: RunningTextData,
+                               courtRoomData: CourtRoomData,
+                               ) extends BaseController {
 
   /**
    * Create an Action to render an HTML page.
@@ -51,11 +54,19 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
   }
 
   def kiosk(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.boards.kiosk())
+    val court_room_list: List[CourtRoom] = courtRoomData.list(0, "active", "kiosk").items
+
+    Ok(views.html.boards.kiosk(court_room_list))
   }
 
   def display(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.boards.display())
+    val running_text_list: List[RunningText] = runningTextData.list().items
+
+    Ok(views.html.boards.display(running_text_list))
+  }
+
+  def cetak(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.printing.cetak_antrian())
   }
 
 }

@@ -50,6 +50,7 @@ class RunningTextData @Inject()(
   def insert(runningText: RunningText): (Option[Any], String) = db.withConnection{ implicit c =>
     val data: Map[String, String] = Map (
       "description" -> runningText.description,
+      "status" -> runningText.status.toString,
     )
     Helpers.insertDB("running_text", data)
   }
@@ -60,7 +61,7 @@ class RunningTextData @Inject()(
       "status" -> runningText.status.toString
     )
 
-    Helpers.updateDB ("running_text", data, s"id = ${runningText.id}")
+    Helpers.updateDB("running_text", data, s"id = ${runningText.id}")
   }
 
   def delete(id: Long): (Int, String) = db.withConnection { implicit c =>

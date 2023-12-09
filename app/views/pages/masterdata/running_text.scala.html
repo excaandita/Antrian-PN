@@ -49,6 +49,8 @@
                                 <th style="width: 8%">Action</th>
                             </tr>
                         </thead>
+                        <tbody id="run_text_list">
+                        </tbody>
                         <tbody id="loading_run_text_list">
                             <tr>
                                 <td colspan="4">
@@ -59,8 +61,6 @@
                                     </div>
                                 </td>
                             </tr>
-                        </tbody>
-                        <tbody id="run_text_list">
                         </tbody>
                     </table>
                 </div>
@@ -92,7 +92,7 @@
                 </div>
                 <form id="formadd_run_text" class="form-horizontal form-label-left">
                     <div class="modal-body">
-                        <input type="hidden" name="server_address_id" id="server_address_id" value="" class="inputfield" />
+                        <input type="hidden" name="id" id="id" value="" class="inputfield form-control" /> 
 
                         <div class="form-group">
                             <label for="form_text">Text</label>
@@ -100,17 +100,17 @@
                         </div>
                         <div class="form-group">
                             <label for="form_status">Status</label>
-                            <select class="form-control" id="form_status">
+                            <select class="form-control" id="form_status" name="status">
                                 <option selected value="1">Aktif</option>
                                 <option value="0">Tidak aktif</option>
                             </select>
                         </div>
                     </div>
+                </form>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Batal</button>
-                        <button type="submit" class="btn btn-primary" id="bt_save"><i class="fa fa-save"></i> Simpan</button>
+                        <button type="submit" class="btn btn-primary" onclick="saveData()"><i class="fa fa-save"></i> Simpan</button>
                     </div>
-                </form>
             </div>
         </div>
     </div>
@@ -162,7 +162,12 @@
         getRunTextList();
     };
 
-    function delete_swal(id){
+    function reset(){
+        $('.form-control').val('');
+        $('#form_status').val('1');
+    }
+
+    function deleteData(id){
         //alert(id)
         Swal.fire({
           title: "Hapus?",
@@ -174,10 +179,34 @@
           confirmButtonText: "Hapus"
         }).then((result) => {
           if (result.isConfirmed) {
-            Swal.fire({
-              title: "Deleted!",
-              text: "Your file has been deleted.",
-              icon: "success"
+            $('#loading_run_text_list').show();
+
+            id = parseInt(id)
+            $.ajax({
+                type: 'DELETE',
+                url: 'api/running_text/delete',
+                data: JSON.stringify({"id": id}),
+                cache: false,
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                success: function(res){
+                    $('#loading_run_text_list').hide();
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: "Your file has been deleted.",
+                        icon: "success"
+                    });
+                    reset();
+                    getRunTextList();
+                },
+                error: function(e){
+                    $('#loading_run_text_list').hide();
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e.responseText,
+                    });
+                }
             });
           }
         });
@@ -191,7 +220,7 @@
             type: 'GET',
             url: 'api/running_text/list/0',
             data:{
-                active: "all"
+                active: ""
             },
             cache: true,
             success: function(res){
@@ -207,8 +236,8 @@
                                 </span>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-success btn-xs mr-1"><i class="fas fa-pen"></i></button>
-                                <button type="button" class="btn btn-danger btn-xs" onclick="delete_swal('${v.id}')"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="btn btn-success btn-xs mr-1" onclick="editData('${v.id}')"><i class="fas fa-pen"></i></button>
+                                <button type="button" class="btn btn-danger btn-xs" onclick="deleteData('${v.id}')"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>
                     `
@@ -226,6 +255,83 @@
             }
         })
     };
+
+    function saveData() {
+        $('#loading_run_text_list').show();
+
+        //check id
+        let id = $('#id').val();
+
+        let action = 'POST';
+        let url = 'api/running_text/insert';
+
+        if(id != '') {
+            action = 'PUT';
+            url = 'api/running_text/update';
+        } 
+
+        //json data
+        let jsonData = {
+            'id': parseInt(id),
+            'description': $('#form_text').val(),
+            'status': parseInt($('#form_status').val()),
+        }
+
+        $.ajax({
+            type: action,
+            url: url,
+            data: JSON.stringify(jsonData),
+            cache: false,
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            success: function(res){
+                $('#loading_run_text_list').hide();
+                $('#modal_add_run_text').modal('hide');
+
+                Swal.fire({
+                  icon: "success",
+                  title: "Berhasil Tambah",
+                  text: "Data Running Text Berhasil di Tambahkan!",
+                });
+                reset();
+                getRunTextList();
+            },
+            error: function(e){
+                $('#loading_run_text_list').hide();
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: e.responseText,
+                });
+            }
+        });
+    }
+
+    function editData(id) {
+        $('#loading_run_text_list').show();
+        $.ajax({
+            type: 'GET',
+            url: '/api/running_text/get/'+id,
+            cache: true,
+            success: function(res){
+                $('#loading_run_text_list').hide();
+
+                $('#id').val(res.data.id)
+                $('#form_text').val(res.data.description)
+                $('#form_status').val(res.data.status)
+
+                $('#modal_add_run_text').modal('show');
+                
+            },
+            error: function(e){
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: e.responseText,
+                });
+            }
+        });
+    }
 
 
 </script>

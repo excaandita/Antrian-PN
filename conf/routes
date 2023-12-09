@@ -16,12 +16,23 @@ GET     /video                      controllers.HomeController.video()
 GET     /kiosk                      controllers.HomeController.kiosk()
 GET     /display                    controllers.HomeController.display()
 
+GET     /cetak_antrian              controllers.HomeController.cetak()
+
 # API
+
+# Running Text
 GET     /api/running_text/list/:p           controllers.api.RunningTextCon.list(p: Int)
 GET     /api/running_text/get/:id           controllers.api.RunningTextCon.get(id:Int)
 POST    /api/running_text/insert            controllers.api.RunningTextCon.add()
 PUT     /api/running_text/update            controllers.api.RunningTextCon.put()
 DELETE  /api/running_text/delete            controllers.api.RunningTextCon.remove()
+
+# Court Room
+GET     /api/court_room/list/:p             controllers.api.CourtRoomCon.list(p: Int)
+GET     /api/court_room/get/:id             controllers.api.CourtRoomCon.get(id:Int)
+POST    /api/court_room/insert              controllers.api.CourtRoomCon.add()
+PUT     /api/court_room/update              controllers.api.CourtRoomCon.put()
+DELETE  /api/court_room/delete              controllers.api.CourtRoomCon.remove()
 
 # Queue
 GET     /api/queue/list/:p                  controllers.api.QueueCon.list(p:Int)

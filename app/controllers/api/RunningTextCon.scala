@@ -35,8 +35,9 @@ class RunningTextCon @Inject()(
   def add(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     val param = request.body.asJson.get
     val description = (param \ "description").as[String]
+    val status = (param \ "status").asOpt[Int].getOrElse(1)
 
-    val runningText = RunningText(-1, description, 1)
+    val runningText = RunningText(-1, description, status)
 
     val res = runningTextData.insert(runningText)
     res match {
