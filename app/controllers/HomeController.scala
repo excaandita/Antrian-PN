@@ -1,7 +1,7 @@
 package controllers
 
-import controllers.transactions.{Kiosk, KioskTrx}
-import models.{RunningText, RunningTextData, QueueData, QueueJoin}
+import controllers.transactions.KioskTrx
+import models.{QueueData, RunningText, RunningTextData}
 import play.api._
 import play.api.mvc._
 import utils.{Helpers, ListResult, ResponseService => Res}
@@ -56,9 +56,9 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
   }
 
   def kiosk(): Action[AnyContent] = Action {
-    val court_room_list: List[Kiosk] = kioskTrx.list()
+//    val court_room_list: List[Kiosk] = kioskTrx.list()
 
-    Ok(views.html.boards.kiosk(court_room_list))
+    Ok(views.html.boards.kiosk())
   }
 
   def display(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>

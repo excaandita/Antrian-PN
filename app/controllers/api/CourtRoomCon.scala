@@ -1,6 +1,7 @@
 package controllers.api
 
-import models.{CourtRoom, CourtRoomData, QueueData}
+import controllers.transactions.{Kiosk, KioskTrx}
+import models.{CourtRoom, CourtRoomData}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import utils.{Helpers, ListResult, ResponseService => Res}
@@ -11,10 +12,11 @@ import javax.inject.{Inject, Singleton}
 class CourtRoomCon @Inject()(
                               cc: ControllerComponents,
                               courtRoomData: CourtRoomData,
-                              queueData: QueueData
+                              kioskTrx: KioskTrx
                               ) extends AbstractController(cc){
 
   import courtRoomData.courtRoomFormat
+  import kioskTrx.kioskFormat
 
   def list(page: Int): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
 
@@ -98,6 +100,15 @@ class CourtRoomCon @Inject()(
     res match {
       case (1, "") => Res.success[JsValue]("Data Ruang Sidang berhasil dihapus.", Json.obj("deleted" -> 1))
       case (0, err) => Res.badRequest("Data Ruang Sidang gagal dihapus.", err)
+    }
+  }
+
+  def listKiosk(): Action[AnyContent] = Action { implicit request =>
+    val res: Option[List[Kiosk]] = kioskTrx.list()
+
+    res match{
+      case Some(res) => Res.success[List[Kiosk]]("Berhasil mendapatkan data kiosk", res)
+      case None => Res.badRequest("Data kiosk kosong.", "")
     }
   }
 

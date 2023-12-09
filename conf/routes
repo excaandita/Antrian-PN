@@ -33,6 +33,7 @@ GET     /api/court_room/get/:id             controllers.api.CourtRoomCon.get(id:
 POST    /api/court_room/insert              controllers.api.CourtRoomCon.add()
 PUT     /api/court_room/update              controllers.api.CourtRoomCon.put()
 DELETE  /api/court_room/delete              controllers.api.CourtRoomCon.remove()
+GET     /api/court_room/kiosk               controllers.api.CourtRoomCon.listKiosk()
 
 # Queue
 #GET     /api/queue/list/:p                  controllers.api.QueueCon.list(p:Int)

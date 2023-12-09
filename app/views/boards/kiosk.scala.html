@@ -1,6 +1,3 @@
-@import controllers.transactions.Kiosk
-@(courtRoomList: List[Kiosk])
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -141,6 +138,10 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .cursor-pointer{
+            cursor: pointer;
+        }
     </style>
   </head>
   <body class="hold-transition">
@@ -152,7 +153,7 @@
         <nav class="navbar d-flex justify-content-between align-item-center py-3">
             <!-- Logo and Company -->
             <div class="col-md-4">
-                <div class="logo-header d-flex align-items-center">
+                <div class="logo-header d-flex align-items-center cursor-pointer" onclick="getListKiosk()">
                     <img src="@routes.Assets.versioned("images/logo_pn.png")" style="width: 65px; margin-right: 24px" alt="logo">
                     <span class="mt-3 mb-2 text-uppercase font-primary" style="width: 60%; font-weight: 900; font-size: 27px;">Pengadilan Negeri Jakarta Utara</span>
                 </div>
@@ -172,17 +173,8 @@
                 </div>
             </div>
         </section>
-        <section class="container">
-            @for(v <- courtRoomList) {
-            <div class="item" onclick="orderAntrian(@v.courtRoom.id)">
-                <div class="example1">
-                    <div class="ic-ruang-sidang">@v.courtRoom.name</div>
-                    <div class="nama-ruang-sidang">@v.courtRoom.description</div>
-                    <div class="no-antri"> Nomor Antrian Terakhir: @v.remaining_queue</div>
-                    <div class="sisa-antrian"> Sisa Antrian: @v.total_queue</div>
-                </div>
-            </div>
-            }
+        <section class="container" id="kiosk_content">
+
         </section>
 
         <section class="content-footer text-center" style="font-size: 12px; font-weight: 300;">
@@ -197,9 +189,14 @@
     <script src="@routes.Assets.versioned("plugins/bootstrap/js/bootstrap.bundle.min.js")"></script>
     <script src="@routes.Assets.versioned("dist/js/adminlte.min.js?v=3.2.0")"></script>
     <script src="@routes.Assets.versioned("plugins/sweetalert2/sweetalert2.min.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
 
 
     <script type="text/javascript">
+        $(function(){
+            getListKiosk()
+        })
+
         var dWidth = $(window).width();
         var dHeight= $(window).height();
         var x = screen.width/2 - dWidth/2;
@@ -269,6 +266,43 @@
             document.getElementById('loadingOverlay').style.display = 'none';
         }
 
+        function getListKiosk(){
+            showLoading();
+            $.ajax({
+                type: 'GET',
+                url: 'api/court_room/kiosk',
+                cache: false,
+                success: function(res){
+                    $('#kiosk_content').empty();
+                    let str = ''
+
+                    $.each(res.data, function(i, v){
+                        str += `
+                          <div class="item" onclick="orderAntrian('${v.courtRoom.id}')">
+                            <div class="example1">
+                              <div class="ic-ruang-sidang">${v.courtRoom.name}</div>
+                              <div class="nama-ruang-sidang">${v.courtRoom.description}</div>
+                              <div class="no-antri"> Nomor Antrian Terakhir: ${v.remaining_queue}</div>
+                              <div class="sisa-antrian"> Sisa Antrian: ${v.total_queue}</div>
+                            </div>
+                          </div>
+                          `
+                    })
+                    $('#kiosk_content').html(str)
+                    hideLoading();
+                },
+                error: function(e){
+                    hideLoading();
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e.responseText,
+                    });
+                }
+            });
+        }
+
         function orderAntrian(id_court_room) {
             showLoading();
             // TODO 
@@ -292,6 +326,7 @@
                         title: "Antrian berhasil dibuat",
                         text: "Silahkan ambil karcis dan menunggu antrian anda",
                     });
+                    getListKiosk()
 
                 },
                 error: function(e){
@@ -307,7 +342,7 @@
         }
 
         function printAntrian(data){
-		    window.open('cetak_antrian?queue_number=' + data.queue + '&court_room_name=' + data.court_room.description + '&date_now=' + data.date_now + '&queue_left=' + data.queue_left, 
+		    window.open('cetak_antrian?queue_number=' + data.queue + '&court_room_name=' + data.court_room.description + '&date_now=' + datetimefmysql(timemilisFormat(data.date_now, true)) + '&queue_left=' + data.queue_left,
                         'Cetak Nomor Antrian',
                         'width='+dWidth+', height='+dHeight+', left='+x+',top='+y);
         }

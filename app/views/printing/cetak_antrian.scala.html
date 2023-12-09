@@ -1,4 +1,4 @@
-@(queue_number: String, date_now: String, court_room_name: String, queue_left: String)
+@(queue_number: String, date_now: String, court_room_name: String, remaining_queue: String)
 
 <title>ANTRIAN</title>
 <style type="text/css">
@@ -24,7 +24,7 @@
 	</div>
 	<div style="text-align: center; font-size: 10pt;">
 		<p style="font-weight: bold; text-transform: uppercase; margin-bottom: -10;">@court_room_name</p> <br>
-		Sisa Antrian : @queue_left <br>
+		Sisa Antrian : @remaining_queue <br>
 	</div>
     <br/>
 	<div style="text-align: center; font-size: 9pt;">
