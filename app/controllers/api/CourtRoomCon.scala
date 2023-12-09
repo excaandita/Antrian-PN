@@ -1,6 +1,6 @@
 package controllers.api
 
-import models.{CourtRoom, CourtRoomData}
+import models.{CourtRoom, CourtRoomData, QueueData}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import utils.{Helpers, ListResult, ResponseService => Res}
@@ -9,7 +9,8 @@ import javax.inject.Inject
 
 class CourtRoomCon @Inject()(
                               cc: ControllerComponents,
-                              courtRoomData: CourtRoomData
+                              courtRoomData: CourtRoomData,
+                              queueData: QueueData
                               ) extends AbstractController(cc){
 
   import courtRoomData.courtRoomFormat
@@ -20,7 +21,17 @@ class CourtRoomCon @Inject()(
     val res: ListResult[CourtRoom] = courtRoomData.list(page, active)
 
     if (res.total > 0) {
-      Res.successWithPage[CourtRoom](res, page, "Court Room")
+      Res.successWithPage[CourtRoom](res, page, "Ruang Sidang")
+    } else NoContent
+  }
+
+  def listKiosk(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+
+    val active: String = Helpers.getData(request, "active")
+    val res: ListResult[CourtRoom] = courtRoomData.list(0, active)
+
+    if (res.total > 0) {
+      Res.successWithPage[CourtRoom](res, page, "Ruang Sidang")
     } else NoContent
   }
 

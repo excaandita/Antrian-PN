@@ -17,12 +17,24 @@ case class CourtRoom(
   active: Int = 1,
   file_sound: String
 )
+
+case class KioskView(
+                      id: Long,
+                      name: String,
+                      description: String,
+                      status: Int = 1,
+                      active: Int = 1,
+                      file_sound: String,
+                      left_queue: Int,
+                      total_queue: Int
+                    )
 class CourtRoomData @Inject()(
                                  DBApi: DBApi,
                                ){
   private val db = DBApi.database("antrian_pn")
 
   implicit val courtRoomFormat: OFormat[CourtRoom] = Json.format[CourtRoom]
+  implicit val kioskViewFormat: OFormat[KioskView] = Json.format[KioskView]
 
   def list(page: Int = 0, active: String = "active", order: String = "list"): ListResult[CourtRoom] = db.withConnection{ implicit c =>
     val startRow = Helpers.start(page)
