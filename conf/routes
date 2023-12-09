@@ -16,7 +16,7 @@ GET     /video                      controllers.HomeController.video()
 GET     /kiosk                      controllers.HomeController.kiosk()
 GET     /display                    controllers.HomeController.display()
 
-GET     /cetak_antrian              controllers.HomeController.cetak()
+GET     /cetak_antrian             controllers.HomeController.cetak()
 
 # API
 

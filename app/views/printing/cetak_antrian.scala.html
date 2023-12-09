@@ -1,3 +1,5 @@
+@(queue_number: String, date_now: String, court_room_name: String, queue_left: String)
+
 <title>ANTRIAN</title>
 <style type="text/css">
 	* {
@@ -16,14 +18,13 @@
 		PN Jakarta Utara<br>
 		<p style="text-align: center; font-size: 10pt; font-weight: 500; margin-top: 3;">Jl. R.E Martadinata No. 4 <br/> Tanjung Periok </p>
 	</div>
-	<div style="text-align: center; font-size: 30
-    pt; font-weight: bold; margin: 15px 0 20px 0;">
-		20 <br>
-		<p style="text-align: center; font-size: 7pt; font-weight: bold; margin-top: 0;">8-12-2023 21:15:00</p>
+	<div style="text-align: center; font-size: 30pt; font-weight: bold; margin: 15px 0 20px 0;">
+		@queue_number <br>
+		<p style="text-align: center; font-size: 7pt; font-weight: bold; margin-top: 0;">@date_now</p>
 	</div>
 	<div style="text-align: center; font-size: 10pt;">
-		<p style="font-weight: bold; text-transform: uppercase; margin-bottom: -10;">Ruang Sidang Pidana</p> <br>
-		Sisa Antrian : 10 <br>
+		<p style="font-weight: bold; text-transform: uppercase; margin-bottom: -10;">@court_room_name</p> <br>
+		Sisa Antrian : @queue_left <br>
 	</div>
     <br/>
 	<div style="text-align: center; font-size: 9pt;">

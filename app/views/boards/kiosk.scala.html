@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("plugins/fontawesome-free/css/all.min.css")"/>
     <link rel="stylesheet" href="@routes.Assets.versioned("plugins/icheck-bootstrap/icheck-bootstrap.min.css")"/>
     <link rel="stylesheet" href="@routes.Assets.versioned("dist/css/adminlte.min.css?v=3.2.0")" />
+    <link rel="stylesheet" href="@routes.Assets.versioned("plugins/sweetalert2/sweetalert2.min.css")">
 
     <style>
         * {
@@ -113,9 +114,39 @@
         .sisa-antrian {
             margin-top: -2.5%;
         }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
   </head>
   <body class="hold-transition">
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
     <div class="content px-5">
         <!-- Navbar -->
         <nav class="navbar d-flex justify-content-between align-item-center py-3">
@@ -143,7 +174,7 @@
         </section>
         <section class="container">
             @for(v <- courtRoomList) {
-            <div class="item">
+            <div class="item" onclick="orderAntrian(@v.courtRoom.id)">
                 <div class="example1">
                     <div class="ic-ruang-sidang">@v.courtRoom.name</div>
                     <div class="nama-ruang-sidang">@v.courtRoom.description</div>
@@ -165,8 +196,15 @@
     <script src="@routes.Assets.versioned("plugins/jquery/jquery.min.js")"></script>
     <script src="@routes.Assets.versioned("plugins/bootstrap/js/bootstrap.bundle.min.js")"></script>
     <script src="@routes.Assets.versioned("dist/js/adminlte.min.js?v=3.2.0")"></script>
+    <script src="@routes.Assets.versioned("plugins/sweetalert2/sweetalert2.min.js")"></script>
+
 
     <script type="text/javascript">
+        var dWidth = $(window).width();
+        var dHeight= $(window).height();
+        var x = screen.width/2 - dWidth/2;
+        var y = screen.height/2 - dHeight/2;
+
         var templatePlugins = function(){
             var tp_clock = function(){
                 function tp_clock_time(){
@@ -221,6 +259,58 @@
         $(document).ready(function() {
             templatePlugins.init();
         });
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+            // Fungsi untuk menyembunyikan loading overlay
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function orderAntrian(id_court_room) {
+            showLoading();
+            // TODO 
+            // 1. create 
+            let jsonData = {
+                'id_court_room': parseInt(id_court_room)
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: 'api/queue/order_queue',
+                data: JSON.stringify(jsonData),
+                cache: false,
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                success: function(res){
+                    hideLoading();
+                    printAntrian(res.data);
+                    Swal.fire({
+                        icon: "success",
+                        title: "Antrian berhasil dibuat",
+                        text: "Silahkan ambil karcis dan menunggu antrian anda",
+                    });
+
+                },
+                error: function(e){
+                    hideLoading();
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e.responseText,
+                    });
+                }
+            });    
+        }
+
+        function printAntrian(data){
+		    window.open('cetak_antrian?queue_number=' + data.queue + '&court_room_name=' + data.court_room.description + '&date_now=' + data.date_now + '&queue_left=' + data.queue_left, 
+                        'Cetak Nomor Antrian',
+                        'width='+dWidth+', height='+dHeight+', left='+x+',top='+y);
+        }
     </script>
   </body>
 </html>

@@ -1,9 +1,10 @@
 package controllers
 
 import controllers.transactions.{Kiosk, KioskTrx}
-import models.{RunningText, RunningTextData}
+import models.{RunningText, RunningTextData, QueueData, QueueJoin}
 import play.api._
 import play.api.mvc._
+import utils.{Helpers, ListResult, ResponseService => Res}
 
 import javax.inject._
 
@@ -14,9 +15,10 @@ import javax.inject._
 @Singleton
 class HomeController @Inject()(val controllerComponents: ControllerComponents,
                                runningTextData: RunningTextData,
-                               kioskTrx: KioskTrx
+                               kioskTrx: KioskTrx,
+                               queueData: QueueData
                                ) extends BaseController {
-
+  import queueData.{queueFormat, queueJoinFormat}
   /**
    * Create an Action to render an HTML page.
    *
@@ -66,7 +68,13 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
   }
 
   def cetak(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.printing.cetak_antrian())
+
+    val queue_number: String = Helpers.getData(request, "queue_number")
+    val date_now: String = Helpers.getData(request, "date_now")
+    val court_room_name: String = Helpers.getData(request, "court_room_name")
+    val queue_left: String = Helpers.getData(request, "queue_left")
+
+    Ok(views.html.printing.cetak_antrian(queue_number, date_now, court_room_name, queue_left))
   }
 
 }
