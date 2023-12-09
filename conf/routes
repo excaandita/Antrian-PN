@@ -35,10 +35,10 @@ PUT     /api/court_room/update              controllers.api.CourtRoomCon.put()
 DELETE  /api/court_room/delete              controllers.api.CourtRoomCon.remove()
 
 # Queue
-GET     /api/queue/list/:p                  controllers.api.QueueCon.list(p:Int)
+#GET     /api/queue/list/:p                  controllers.api.QueueCon.list(p:Int)
 GET     /api/queue/get/:id                  controllers.api.QueueCon.get(id:Int)
 GET     /api/queue/get_queue                controllers.api.QueueCon.getQueue()
-POST    /api/queue/insert                   controllers.api.QueueCon.add()
+POST    /api/queue/order_queue              controllers.api.QueueCon.add()
 #PUT     /api/queue/update                   controllers.api.QueueCon.put()
 #DELETE  /api/queue/delete                   controllers.api.QueueCon.remove()
 

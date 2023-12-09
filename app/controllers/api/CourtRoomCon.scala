@@ -17,8 +17,11 @@ class CourtRoomCon @Inject()(
 
   def list(page: Int): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
 
-    val active: String = Helpers.getData(request, "active")
-    val res: ListResult[CourtRoom] = courtRoomData.list(page, active)
+    val param: Map[String, String] = Map(
+      "active" -> Helpers.getData(request, "active"),
+      "order" -> Helpers.getData(request, "order")
+    )
+    val res: ListResult[CourtRoom] = courtRoomData.list(page, param)
 
     if (res.total > 0) {
       Res.successWithPage[CourtRoom](res, page, "Ruang Sidang")
@@ -27,11 +30,14 @@ class CourtRoomCon @Inject()(
 
   def listKiosk(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
 
-    val active: String = Helpers.getData(request, "active")
-    val res: ListResult[CourtRoom] = courtRoomData.list(0, active)
+    val param: Map[String, String] = Map(
+      "active" -> Helpers.getData(request, "active"),
+    "order" -> Helpers.getData(request, "order")
+    )
+    val res: ListResult[CourtRoom] = courtRoomData.list(0, param)
 
     if (res.total > 0) {
-      Res.successWithPage[CourtRoom](res, page, "Ruang Sidang")
+      Res.successWithPage[CourtRoom](res, 0, "Ruang Sidang")
     } else NoContent
   }
 
@@ -86,8 +92,8 @@ class CourtRoomCon @Inject()(
             "court_room_id" -> courtRoom.id,
             "court_room_name" -> courtRoom.name,
             "court_room_desc" -> courtRoom.description,
-            "court_room_status" -> courtRoom.status,
-            "court_room_active" -> courtRoom.active,
+            "court_room_active_monitor" -> courtRoom.active_monitor,
+            "court_room_active_kiosk" -> courtRoom.active_kiosk,
             "court_room_file_sound" -> courtRoom.file_sound,
           ))
       case (-1, message) => {

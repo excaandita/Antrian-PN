@@ -13,8 +13,8 @@ case class CourtRoom(
   id: Long,
   name: String,
   description: String,
-  status: Int = 1,
-  active: Int = 1,
+  active_monitor: Int = 1,
+  active_kiosk: Int = 1,
   file_sound: String
 )
 
@@ -22,8 +22,8 @@ case class KioskView(
                       id: Long,
                       name: String,
                       description: String,
-                      status: Int = 1,
-                      active: Int = 1,
+                      active_monitor: Int,
+                      active_kiosk: Int,
                       file_sound: String,
                       left_queue: Int,
                       total_queue: Int
@@ -36,19 +36,21 @@ class CourtRoomData @Inject()(
   implicit val courtRoomFormat: OFormat[CourtRoom] = Json.format[CourtRoom]
   implicit val kioskViewFormat: OFormat[KioskView] = Json.format[KioskView]
 
-  def list(page: Int = 0, active: String = "active", order: String = "list"): ListResult[CourtRoom] = db.withConnection{ implicit c =>
+  def list(page: Int = 0, param: Map[String, String]): ListResult[CourtRoom] = db.withConnection{ implicit c =>
     val startRow = Helpers.start(page)
     val limitation = (if (page > 0) s" LIMIT ${Helpers.limit} OFFSET ${startRow} " else "")
 
-    val is_active: String = active match {
+//    active: String = "active", order: String = "list"
+
+    val is_active: String = param("active") match {
       case "active" => " WHERE active = 1 "
       case "inactive" => " WHERE active = 0 "
       case _ => " "
     }
 
-    val is_order: String = order match {
-      case "list" => " order by id asc "
-      case "kiosk" => " order by name asc "
+    val is_order: String = param("order") match {
+      case "id" => " order by id asc "
+      case "name" => " order by name asc "
       case _ => " "
     }
 
@@ -72,8 +74,8 @@ class CourtRoomData @Inject()(
     val data: Map[String, String] = Map (
       "name" -> courtRoom.name,
       "description" -> courtRoom.description,
-      "status" -> courtRoom.status.toString,
-      "active" -> courtRoom.active.toString,
+      "active_monitor" -> courtRoom.active_monitor.toString,
+      "active_kiosk" -> courtRoom.active_kiosk.toString,
       "file_sound" -> courtRoom.file_sound,
     )
     Helpers.insertDB("court_room", data)
@@ -83,8 +85,8 @@ class CourtRoomData @Inject()(
     val data: Map[String, String] = Map (
       "name" -> courtRoom.name,
       "description" -> courtRoom.description,
-      "status" -> courtRoom.status.toString,
-      "active" -> courtRoom.active.toString,
+      "active_monitor" -> courtRoom.active_monitor.toString,
+      "active_kiosk" -> courtRoom.active_kiosk.toString,
       "file_sound" -> courtRoom.file_sound,
     )
 

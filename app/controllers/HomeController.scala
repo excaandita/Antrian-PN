@@ -1,7 +1,6 @@
 package controllers
 
-import models.{RunningText, RunningTextData}
-import models.{CourtRoom, CourtRoomData}
+import models.{CourtRoom, CourtRoomData, RunningText, RunningTextData}
 import play.api._
 import play.api.mvc._
 
@@ -54,7 +53,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
   }
 
   def kiosk(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    val court_room_list: List[CourtRoom] = courtRoomData.list(0, "active", "kiosk").items
+    val court_room_list: List[CourtRoom] = courtRoomData.list(0, Map("active"-> "active")).items
 
     Ok(views.html.boards.kiosk(court_room_list))
   }

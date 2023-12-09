@@ -12,10 +12,8 @@ class QueueCon @Inject()(cc: ControllerComponents,
                          queueData: QueueData,
                          courtRoomData: CourtRoomData
                         ) extends AbstractController(cc){
-  import queueData.queueFormat
-
   import courtRoomData.courtRoomFormat
-  import queueData.queueJoinFormat
+  import queueData.{queueFormat, queueJoinFormat}
 
   def list(page: Int): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
 
@@ -50,19 +48,18 @@ class QueueCon @Inject()(cc: ControllerComponents,
   def add(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     val param = request.body.asJson.get
     val idCourtRoom: Long = (param \ "id_court_room").as[Long]
-    val date: String = (param \ "date").as[String]
+//    val date: String = (param \ "date").asOpt[String].getOrElse()
 
+    val now: ju.Date = new ju.Date()
+    val nowTimestamp: js.Timestamp = new js.Timestamp(System.currentTimeMillis())
 //    GET LAST queue by id court room
     val queueNumber: Int = {
-      val lastQueue: Option[Int] = queueData.getQueue(idCourtRoom, date)
+      val lastQueue: Option[Int] = queueData.getQueue(idCourtRoom, Helpers.date2String(now, "yyyy-MM-dd"))
       lastQueue match{
         case Some(queueNum) => queueNum + 1
         case None => 1
       }
     }
-
-    val now: ju.Date = new ju.Date()
-    val nowTimestamp: js.Timestamp = new js.Timestamp(System.currentTimeMillis())
 
     val queue = Queue(-1, now, queueNumber, idCourtRoom, None, nowTimestamp, 0)
 
@@ -93,7 +90,7 @@ class QueueCon @Inject()(cc: ControllerComponents,
           )
         )
       }else{
-       Ok("")
+        Res.badRequest("Data queue gagal ditambahkan", "Gagal mendapatkan data antrian terakhir")
       }
     }else{
       Res.badRequest("Data queue gagal ditambahkan", res._1)
