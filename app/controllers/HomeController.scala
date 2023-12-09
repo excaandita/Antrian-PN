@@ -1,6 +1,7 @@
 package controllers
 
-import models.{CourtRoom, CourtRoomData, RunningText, RunningTextData}
+import controllers.transactions.{Kiosk, KioskTrx}
+import models.{RunningText, RunningTextData}
 import play.api._
 import play.api.mvc._
 
@@ -13,7 +14,7 @@ import javax.inject._
 @Singleton
 class HomeController @Inject()(val controllerComponents: ControllerComponents,
                                runningTextData: RunningTextData,
-                               courtRoomData: CourtRoomData,
+                               kioskTrx: KioskTrx
                                ) extends BaseController {
 
   /**
@@ -52,8 +53,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
     Ok(views.html.pages.antrian())
   }
 
-  def kiosk(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    val court_room_list: List[CourtRoom] = courtRoomData.list(0, Map("active"-> "active")).items
+  def kiosk(): Action[AnyContent] = Action {
+    val court_room_list: List[Kiosk] = kioskTrx.list()
 
     Ok(views.html.boards.kiosk(court_room_list))
   }

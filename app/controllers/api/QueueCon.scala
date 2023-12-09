@@ -6,8 +6,9 @@ import play.api.mvc._
 import utils.{Helpers, ListResult, ResponseService => Res}
 
 import java.{sql => js, util => ju}
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class QueueCon @Inject()(cc: ControllerComponents,
                          queueData: QueueData,
                          courtRoomData: CourtRoomData
@@ -37,7 +38,7 @@ class QueueCon @Inject()(cc: ControllerComponents,
     val idCourtRoom: String = Helpers.getData(request, "id_court_room")
     val date: String = Helpers.getData(request, "date")
 
-    val res: Option[Int] = queueData.getQueue(idCourtRoom.toLong, date)
+    val res: Option[Int] = queueData.lastQueue(idCourtRoom.toLong, date)
 
     res match {
       case Some(res) => Res.success[Int]("Berhasil mendapatkan data queue.", res)
@@ -54,7 +55,7 @@ class QueueCon @Inject()(cc: ControllerComponents,
     val nowTimestamp: js.Timestamp = new js.Timestamp(System.currentTimeMillis())
 //    GET LAST queue by id court room
     val queueNumber: Int = {
-      val lastQueue: Option[Int] = queueData.getQueue(idCourtRoom, Helpers.date2String(now, "yyyy-MM-dd"))
+      val lastQueue: Option[Int] = queueData.lastQueue(idCourtRoom, Helpers.date2String(now, "yyyy-MM-dd"))
       lastQueue match{
         case Some(queueNum) => queueNum + 1
         case None => 1
@@ -78,7 +79,7 @@ class QueueCon @Inject()(cc: ControllerComponents,
       val getQueue: Option[QueueJoin] = queueData.get(res._2)
 
 //      count queue left
-      val queueLeft: Int = queueData.getQueueLeft(idCourtRoom, Helpers.date2String(now, "yyyy-MM-dd"))
+      val remainingQueue: Int = queueData.remainingQueue(idCourtRoom, Helpers.date2String(now, "yyyy-MM-dd"))
 
       if(getQueue.isDefined){
         Res.created("Data queue berhasil ditambahkan",
@@ -86,7 +87,7 @@ class QueueCon @Inject()(cc: ControllerComponents,
             "queue" -> getQueue.get.queue_number,
             "date_now" -> getQueue.get.pick_up_time,
             "court_room" -> getQueue.get.court_room.get,
-            "queue_left" -> queueLeft
+            "queue_left" -> remainingQueue
           )
         )
       }else{

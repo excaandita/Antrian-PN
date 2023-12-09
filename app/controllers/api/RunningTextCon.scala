@@ -5,8 +5,9 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import utils.{Helpers, ListResult, ResponseService => Res}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class RunningTextCon @Inject()(
                               cc: ControllerComponents,
                               runningTextData: RunningTextData

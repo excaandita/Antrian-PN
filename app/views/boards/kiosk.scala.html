@@ -1,4 +1,5 @@
-@(courtRoomList: List[CourtRoom])
+@import controllers.transactions.Kiosk
+@(courtRoomList: List[Kiosk])
 
 <!DOCTYPE html>
 <html lang="en">
@@ -142,14 +143,14 @@
         </section>
         <section class="container">
             @for(v <- courtRoomList) {
-                <div class="item">
-                    <div class="example1">
-                        <div class="ic-ruang-sidang">@v.name</div>
-                        <div class="nama-ruang-sidang">@v.description</div>
-                        <div class="no-antri"> Nomor Antrian Terakhir: 2</div>
-                        <div class="sisa-antrian"> Sisa Antrian: 10</div>
-                    </div>
+            <div class="item">
+                <div class="example1">
+                    <div class="ic-ruang-sidang">@v.courtRoom.name</div>
+                    <div class="nama-ruang-sidang">@v.courtRoom.description</div>
+                    <div class="no-antri"> Nomor Antrian Terakhir: @v.remaining_queue</div>
+                    <div class="sisa-antrian"> Sisa Antrian: @v.total_queue</div>
                 </div>
+            </div>
             }
         </section>
 

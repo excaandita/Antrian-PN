@@ -7,6 +7,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{Json, OFormat, _}
 import utils.{Helpers, ListResult}
 
+import java.util.Date
 import java.{sql => js, util => ju}
 import javax.inject.Inject
 
@@ -35,6 +36,7 @@ class QueueData @Inject()(
                                  courtRoomData: CourtRoomData
                                ) {
   private val db = DBApi.database("antrian_pn")
+  private val today = Helpers.date2String(new Date(), "yyyy-MM-dd")
 
 
 
@@ -82,7 +84,7 @@ class QueueData @Inject()(
     SQL(query).on("id" -> id).as(QueueParser.queueJoinParser.singleOpt)
   }
 
-  def getQueueLeft(idCourtRoom: Long, date: String): Int = db.withConnection { implicit c =>
+  def remainingQueue(idCourtRoom: Long, date: String = today): Int = db.withConnection { implicit c =>
     val query: String =
       """
         |SELECT COUNT(status) FROM queue q
@@ -91,7 +93,16 @@ class QueueData @Inject()(
     SQL(query).on("idCourtRoom" -> idCourtRoom, "date" -> date).as(scalar[Int].single)
   }
 
-  def getQueue(idCourtRoom: Long, date: String): Option[Int] = db.withConnection{implicit c =>
+  def totalQueue(idCourtRoom: Long, date: String = today): Int = db.withConnection { implicit c =>
+    val query: String =
+      """
+        |SELECT COUNT(id) FROM queue q
+        |WHERE q.id_court_room = {idCourtRoom} AND date = {date} """.stripMargin
+
+    SQL(query).on("idCourtRoom" -> idCourtRoom, "date" -> date).as(scalar[Int].single)
+  }
+
+  def lastQueue(idCourtRoom: Long, date: String = today): Option[Int] = db.withConnection{implicit c =>
     val query: String =
       """SELECT queue_number FROM queue
         |WHERE id_court_room = {idCourtRoom} AND date = {dateNow}

@@ -5,8 +5,9 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import utils.{Helpers, ListResult, ResponseService => Res}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class CourtRoomCon @Inject()(
                               cc: ControllerComponents,
                               courtRoomData: CourtRoomData,
@@ -18,26 +19,13 @@ class CourtRoomCon @Inject()(
   def list(page: Int): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
 
     val param: Map[String, String] = Map(
-      "active" -> Helpers.getData(request, "active"),
+      "active_kiosk" -> Helpers.getData(request, "active_kiosk"),
       "order" -> Helpers.getData(request, "order")
     )
     val res: ListResult[CourtRoom] = courtRoomData.list(page, param)
 
     if (res.total > 0) {
       Res.successWithPage[CourtRoom](res, page, "Ruang Sidang")
-    } else NoContent
-  }
-
-  def listKiosk(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-
-    val param: Map[String, String] = Map(
-      "active" -> Helpers.getData(request, "active"),
-    "order" -> Helpers.getData(request, "order")
-    )
-    val res: ListResult[CourtRoom] = courtRoomData.list(0, param)
-
-    if (res.total > 0) {
-      Res.successWithPage[CourtRoom](res, 0, "Ruang Sidang")
     } else NoContent
   }
 
