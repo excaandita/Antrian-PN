@@ -1,5 +1,5 @@
-
-
+@import controllers.transactions.DisplayCourt
+@(courtRoomList: List[DisplayCourt])
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -42,11 +42,11 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <label>Ruang Sidang</label>
-                                            <select class="form-control">
-                                                <option value="">Ruang Sidang 1 Pidana</option>
-                                                <option value="">Ruang Sidang 2 Pidana</option>
-                                                <option value="">Ruang Sidang 3 Hukum</option>
-                                                <option value="">Ruang Sidang 4 Perdata</option>
+                                            <select class="form-control" id="id_court_room">
+                                                <option selected value="">Pilih...</option>
+                                                @for(v <- courtRoomList) {
+                                                    <option value="@v.courtRoom.id">@v.courtRoom.description</option>
+                                                }
                                             </select>
                                         </div>
                                     </div>
@@ -57,7 +57,7 @@
                                         <div class="small-box bg-success">
                                             <div class="inner text-center">
                                                 <p style="font-weight: bolder;">Antrian Saat Ini</p>
-                                                <p style="font-size: 70px; font-weight: bolder;">0</p>
+                                                <span style="font-size: 70px; font-weight: bolder;" id="nomor_antrian">0</span>
                                             </div>
                                         </div>
                                     </div>
@@ -65,18 +65,18 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-4">
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-danger form-control"><i class="fas fa-backward"></i>&nbsp; Sebelumnya</button>
+                                        <div class="form-group" id="button_antrian_sebelumnya">
+                                            <button type="button" class="btn btn-danger form-control"><i class="fas fa-backward"></i>&nbsp; Sebelumnya</button>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-warning form-control"><i class="fas fa-pause-circle"></i>&nbsp; Sekarang</button>
+                                        <div class="form-group" id="button_antrian_sekarang">
+                                            <button type="button" class="btn btn-warning form-control"><i class="fas fa-pause-circle"></i>&nbsp; Sekarang</button>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-info form-control">Selanjutnya &nbsp;<i class="fas fa-forward"></i></button>
+                                        <div class="form-group" id="button_antrian_selanjutnya">
+                                            <button type="button" class="btn btn-info form-control">Selanjutnya &nbsp;<i class="fas fa-forward"></i></button>
                                         </div>
                                     </div>
                                 </div> 
@@ -104,18 +104,18 @@
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>Ruang Sidang</label>
-                                            <select class="form-control">
-                                                <option value="">Ruang Sidang 1 Pidana</option>
-                                                <option value="">Ruang Sidang 2 Pidana</option>
-                                                <option value="">Ruang Sidang 3 Hukum</option>
-                                                <option value="">Ruang Sidang 4 Perdata</option>
+                                            <select class="form-control" id="id_court_room_manual">
+                                                <option selected value="">Pilih...</option>
+                                                @for(v <- courtRoomList) {
+                                                    <option value="@v.courtRoom.id">@v.courtRoom.description</option>
+                                                }
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>Total Antrian</label>
-                                            <input type="text" class="form-control-plaintext" placeholder="-" disabled>
+                                            <input type="text" class="form-control-plaintext" id="total_antrian_manual" placeholder="-" disabled>
                                         </div>
                                     </div>
                                 </div>
@@ -147,4 +147,169 @@
     </section>
     <!-- /.content -->
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        $('#id_court_room').change(function(){
+            let id = $('#id_court_room').val();
+
+            getQueuePanggil(id);
+
+        });
+
+        $('#id_court_room_manual').change(function(){
+            let id_manual = $('#id_court_room_manual').val();
+
+            getQueuePanggilManual(id_manual);
+        });
+
+    });
+
+    function getQueuePanggil(id){
+        $.ajax({
+            type: 'GET',
+            url: 'api/queue/queue_number?id_court_room='+id,
+            cache: true,
+            success: function(res){
+                console.log(res);
+                
+                $('#nomor_antrian').html(res.data.queue_number)
+
+                manageButtonPanggil(res.data.id_queue_prev, res.data.id_queue_now, res.data.id_queue_next);
+                
+            },
+            error: function(e){
+                if(e.data == undefined){
+                    Swal.fire({
+                        icon: "info",
+                        title: "Oops...",
+                        text: "Antrian Tidak Ada!!",
+                    });
+
+                    manageButtonPanggil(null, null, null);
+                    $('#nomor_antrian').html('0')
+
+                } else {
+            
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e.responseText,
+                    });
+                }
+            }
+        })
+    }
+
+    function getQueuePanggilManual(id){
+        $.ajax({
+            type: 'GET',
+            url: 'api/queue/queue_number?id_court_room='+id,
+            cache: true,
+            success: function(res){
+                console.log(res);
+                
+                $('#total_antrian_manual').val(res.data.queue_number)
+
+            },
+            error: function(e){
+                if(e.data == undefined){
+                    Swal.fire({
+                        icon: "info",
+                        title: "Oops...",
+                        text: "Antrian Tidak Ada!!",
+                    });
+
+                    manageButtonPanggil(null, null, null);
+                    $('#total_antrian_manual').html('0')
+
+                } else {
+            
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e.responseText,
+                    });
+                }
+            }
+        })
+    }
+
+    function manageButtonPanggil(idQueuePrev, idQueueNow, idQueueNext) {
+        $('#button_antrian_sebelumnya').html('<button type="button" class="btn btn-danger form-control" id="button_antrian_sebelumnya" onClick="return panggilAntrian('+idQueuePrev+')"><i class="fas fa-backward"></i>&nbsp; Sebelumnya</button>')
+        $('#button_antrian_sekarang').html('<button type="button" class="btn btn-warning form-control"  id="button_antrian_sekarang" onClick="return panggilAntrian('+idQueueNow+')"><i class="fas fa-pause-circle"></i>&nbsp; Sekarang</button>')
+        $('#button_antrian_selanjutnya').html('<button type="button" class="btn btn-info form-control" id="button_antrian_selanjutnya" onClick="return panggilAntrian('+idQueueNext+')">Selanjutnya &nbsp;<i class="fas fa-forward"></i></button>')
+    }
+
+    function panggilAntrian(id){
+        if(id == null) {
+            Swal.fire({
+                icon: "info",
+                title: "Oops...",
+                text: "Tidak ada antrian berikutnya...",
+            });
+
+            return false;
+        }
+
+        let jsonData = {
+            'id_queue': parseInt(id)
+        }
+
+        $.ajax({
+            type: 'PUT',
+            url: 'api/queue/call_queue',
+            data: JSON.stringify(jsonData),
+            cache: true,
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            success: function(res){
+                console.log(res);
+                
+                $('#nomor_antrian').html(res.data.queue)
+                manageButtonPanggil(res.data.id_queue_prev, res.data.id_queue_now, res.data.id_queue_next);
+                
+                let jsonPush = {
+                    'no_antri': parseInt(res.data.queue),
+                    'file_sound': res.data.court_room.file_sound,
+                    'id_court_room': res.data.court_room.id,
+                    'panggil': 'ya',
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'queue/push_display',
+                    data: JSON.stringify(jsonPush),
+                    cache: true,
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    success: function(data) {
+                        console.log(data);
+                    },
+                    error: function(e){
+                        console.log(e);
+                    }
+                })
+                
+            },
+            error: function(e){
+                if(e.data == undefined){
+                    Swal.fire({
+                        icon: "info",
+                        title: "Oops...",
+                        text: "Antrian Tidak Ada!!",
+                    });
+                } else {
+            
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e.responseText,
+                    });
+                }
+            }
+        })
+    }
+</script>
   

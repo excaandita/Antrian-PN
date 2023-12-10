@@ -16,8 +16,13 @@ class QueueCon @Inject()(cc: ControllerComponents,
   import courtRoomData.courtRoomFormat
   import queueData.{queueFormat, queueJoinFormat}
 
-  def list(): Action[AnyContent] = Action {
+  def list(page: Int): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    val active: String = Helpers.getData(request, "active")
+    val res: ListResult[Queue] = queueData.list(page, active)
 
+    if (res.total > 0) {
+      Res.successWithPage[Queue](res, page, "Queue")
+    } else NoContent
   }
   def get(id: Int): Action[AnyContent] = Action{
     val res: Option[QueueJoin] = queueData.get(id)

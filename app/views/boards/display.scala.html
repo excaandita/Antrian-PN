@@ -22,7 +22,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-   
+    <script src="@routes.Assets.versioned("plugins/jquery/Queue.src.js")"></script>
 
     <style>
         * {
@@ -186,10 +186,10 @@
                     <div class="col-lg-5    ">
                         <div class="box-antrian">
                             @for(v <- courtRoomList) {
-                                <div class="item d-none" id="ruang_@v.courtRoom.id">
+                                <div class="item" id="ruang_@v.courtRoom.id">
                                     <div class="example1">
-                                        <div class="nama-ruang-sidang" style="line-height:30px">@v.courtRoom.description</div>
-                                        <div class="ic-ruang-sidang">0</div>
+                                        <div class="nama-ruang-sidang" id="nama_ruang" style="line-height:30px">@v.courtRoom.description</div>
+                                        <div class="ic-ruang-sidang" id="queue_@v.courtRoom.id">0</div>
                                     </div>
                                 </div>
                             }
@@ -244,6 +244,12 @@
     <script src="@routes.Assets.versioned("dist/js/adminlte.min.js?v=3.2.0")"></script>
 
     <script type="text/javascript">
+
+        var queue = new Queue();
+        var static_queue = new Queue(); 
+        var nyala = false;
+        var isAntri = true;
+
         var templatePlugins = function(){
             var tp_clock = function(){
                 function tp_clock_time(){
@@ -296,7 +302,7 @@
         }();
 
         $(document).ready(function() {
-
+            test_antrian();
             $('.selectpicker').change(function () {
                 var selectedItem = $('.selectpicker').val();
             });
@@ -306,6 +312,18 @@
             storageNow.forEach(element => { 
                 $('#'+element).removeClass("d-none");
             });
+
+            var evtSource = new EventSource('/queue/notif_display_channel');
+            evtSource.addEventListener("message", function(e) {
+                var x = JSON.parse(e.data);
+                var obj = x.data;
+                console.log(obj);
+
+                if(obj.panggil == 'ya'){
+                    panggil_antrian(obj.no_antri, obj.id_court_room, obj.file_sound);
+                }
+                
+            }, false);
 
             templatePlugins.init();
 
@@ -335,6 +353,208 @@
         function closeModalCluster() {
             $('#modal_cluster').modal('hide');
         }
+
+        function panggil_antrian(number, id_court_room, sound){
+            if(number > 0 && nyala == true){
+                var item = number+'#'+id_court_room+'#'+sound;
+                console.log(item);
+                // display antrian dan cookie
+                manage_display(number, id_court_room);
+                // enqueue an item
+                queue.enqueue(item);
+                static_queue.enqueue(item);
+                var static_length = static_queue.getLength();
+                var length = queue.getLength();
+                if (static_length == 1) {
+                    ambil_antrian();
+                }
+            }
+        }
+
+        function test_antrian(){
+            const end = new Audio('/api/speech/audio/end.mp3');
+            end.addEventListener('ended', function(){
+                nyala = true;
+            });
+            end.play();
+            // ambil_antrian();  
+        }
+
+        function ambil_antrian(){
+            // get the item at the front of the queue
+            // queue.dequeue();
+            var item = queue.peek();
+            var length = queue.getLength();
+            var audio = (item != undefined)?item.split('#'):null;
+            console.log(length+' ambil_antrian2');
+
+            if (length > 0) {
+                console.log(audio[0]+', '+audio[1]+', '+audio[2]);
+                play_antrian(audio[0],audio[1],audio[2]);
+
+                queue.dequeue();
+            }else{
+                var static_length = static_queue.getLength();
+                for(var i = 0; i <= static_length; i++){
+                    static_queue.dequeue();
+                }
+                console.log('Akhir antrian : ' + static_queue.getLength());
+            }
+        }
+
+        function play_antrian(number, court_room, sound) {
+            // var next_antrian = true;
+            if(number >= 0){
+            	var words = "";
+            	var arr_number = ["nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
+
+	            if(number < 1000){
+	                if(number<12)
+	                {
+	                    var array = [arr_number[number]];
+	                }
+	                else if(number<20)
+	                {
+	                    var array = [arr_number[number%10], 'belas'];
+	                }
+	                else if(number<100)
+	                {
+	                    var num = number.toString();
+	                    var arr_num = num.split("").reverse("");
+	                    if (arr_num[0] == '0') 
+	                    {
+	                        var array = [arr_number[Math.floor(number/10)], 'puluh'];
+	                    }else{
+	                        var array = [arr_number[Math.floor(number/10)], 'puluh', arr_number[number%10]];
+	                    }
+	                }
+	                else if(number == 100)
+	                {
+	                    var array = ['seratus'];
+	                }
+	                else if((number > 100) && (number < 112))
+	                {
+	                    var array = ['seratus', arr_number[number%100]];
+	                }
+	                else if((number > 111) && number < 120) 
+	                {
+	                    var array = ['seratus', arr_number[number%10], 'belas'];
+	                }
+	                else if((number > 119) && (number<200))
+	                {
+	                    if(number == 120 || number == 130  || number == 140  || number == 150  || number == 160  || number == 170  || number == 180  || number == 190 ){
+	                        var array = ['seratus', arr_number[Math.floor((number - 100)/10)], 'puluh'];
+	                    }else{
+	                        var array = ['seratus', arr_number[Math.floor((number - 100)/10)], 'puluh', arr_number[number%10]];
+	                    }
+	                }
+	                else if(number > 199 || number < 1000)
+                    {
+                        var num = number.toString();
+                        var arr_num = num.split("").reverse("");
+                        var var_puluhan = Math.floor((number - (Math.floor(number/100) * 100))/10);
+                        var var_satuan = Math.floor(number - (Math.floor(number/100) * 100))%10;
+                         if(arr_num[1] == '0' && arr_num[0] == '0'){
+                            var array = [arr_number[Math.floor(number/100)], 'ratus'];
+                        }else if(arr_num[1] == '1' && arr_num[0] == '0'){
+                            var array = [arr_number[Math.floor(number/100)], 'ratus', 'sepuluh'];
+                        }else if(arr_num[1] == '1' && arr_num[0] == '1'){
+                            var array = [arr_number[Math.floor(number/100)], 'ratus', 'sebelas'];
+                        }else if(arr_num[1] == '1' && parseInt(arr_num[0]) > 1){
+                            var array = [arr_number[Math.floor(number/100)], 'ratus', arr_number[parseInt(arr_num[0])], 'belas'];
+                        }else if(arr_num[1] == '1' && parseInt(arr_num[0]) > 1){
+                            var array = [arr_number[Math.floor(number/100)], 'ratus', arr_number[parseInt(arr_num[0])], 'belas'];
+                        }else if(arr_num[1] == '0' && parseInt(arr_num[0]) > 0){
+                            var array = [arr_number[Math.floor(number/100)], 'ratus', arr_number[var_satuan]];
+                        }else if(parseInt(arr_num[1]) > 1 && parseInt(arr_num[0]) == 0){
+                            var array = [arr_number[Math.floor(number/100)], 'ratus', arr_number[var_puluhan], 'puluh'];
+                        }else{
+                            var array = [arr_number[Math.floor(number/100)], 'ratus', arr_number[var_puluhan], 'puluh', arr_number[var_satuan]];
+                        }
+                    }
+	            }else{
+	                var num = number.toString();
+	                var arr_num = num.split("");
+	                var array = [];
+	                arr_num.forEach(function(value, i, myArray) {
+	                    array[i] = arr_number[parseInt(value)];
+	                }); 
+	            }
+	           	var nilai = text_speech(array, (array.length - 1), sound, court_room);
+            }
+        }
+
+        function text_speech(myArray, last, sound, court_room) {
+            text_speech_court_room(myArray, last, sound, court_room);
+        }
+
+        function text_speech_court_room(myArray, last, sound, court_room) {
+            if(myArray != undefined){
+                // untuk awalan
+                const end = new Audio('/api/speech/audio/end.mp3');
+                const start = new Audio('/api/speech/audio/start.mp3');
+                const nomor_antrian = new Audio('/api/speech/audio/nomor_antrian.mp3');
+                const poli = new Audio('/api/speech/audio/' + sound);
+                const silahkan = new Audio('/api/speech/audio/silahkan_menuju.mp3');
+
+                start.addEventListener('ended', function(){
+                    nomor_antrian.play();
+                });
+                start.play();
+
+                // nomor antrian
+                myArray.forEach(myFunction);
+                nomor_antrian.addEventListener('ended', function(){
+                    myArray[0].play();
+                });
+                
+                // untuk 'silahkan menuju ke'
+                myArray[last].addEventListener('ended', function(){
+                    silahkan.play();
+                });
+
+                // untuk 'nama poli'
+                silahkan.addEventListener('ended', function(){
+                    poli.play();
+                });
+
+                poli.addEventListener('ended', function(){
+                    end.play();
+                });
+
+                end.addEventListener('ended', function(){
+                    ambil_antrian();
+                });
+            }else{
+                console.log('undefined');
+                exit;
+                return 'number';
+            }
+        }
+
+        function myFunction(value, i, myArray) {
+            var link = `/api/speech/audio/${value}.mp3`;
+            myArray[i] = new Audio(link);
+            myArray[i].addEventListener('ended', function(){
+                if (myArray[i+1] != undefined) {
+                    myArray[i+1].play();
+                }
+            });
+        }
+
+        function manage_display(no_antri) {
+            $('#no_antri').html(pad(no_antri, 3));
+            $(`#queue_${kd_poli}`).html(pad(no_antri, 3));
+        }
+
+        function pad(number, length) {
+            let str = '' + number;
+            while (str.length < length) {
+                str = '0' + str;
+            }
+            return str;
+        }
+        
     </script>
   </body>
 </html>

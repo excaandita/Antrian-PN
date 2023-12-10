@@ -54,7 +54,9 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
 
 //  ANTRIAN
   def queue(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.pages.antrian())
+    val court_room_list: List[DisplayCourt] = displayTrx.list()
+
+    Ok(views.html.pages.antrian(court_room_list))
   }
 
   def kiosk(): Action[AnyContent] = Action {
