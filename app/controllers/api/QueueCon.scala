@@ -144,7 +144,7 @@ class QueueCon @Inject()(cc: ControllerComponents,
               "court_room" -> getQueue.get.court_room,
               "remaining_queue" -> remainingQueue,
               "id_queue_next" -> nextQueue,
-              "id_queue_now" -> getQueue.get.queue_number,
+              "id_queue_now" -> getQueue.get.id,
               "id_queue_prev" -> prevQueue
             ))
         case (-1, message) => {
