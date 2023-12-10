@@ -22,6 +22,7 @@ class KioskTrx @Inject()(
 
     val param: Map[String, String] = Map(
       "active_kiosk" -> "active",
+      "active_monitor" -> "",
       "order" -> "name"
     )
     val res: ListResult[CourtRoom] = courtRoomData.list(0, param)

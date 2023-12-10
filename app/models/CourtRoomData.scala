@@ -37,6 +37,12 @@ class CourtRoomData @Inject()(
       case _ => " "
     }
 
+    val is_active_monitor: String = param("active_monitor") match {
+      case "active" => " WHERE active_monitor = 1 "
+      case "inactive" => " WHERE active_monitor = 0 "
+      case _ => " "
+    }
+
     val is_order: String = param("order") match {
       case "id" => " order by id asc "
       case "name" => " order by name asc "
@@ -48,7 +54,7 @@ class CourtRoomData @Inject()(
     val count = "SELECT COUNT(*) FROM court_room "
     val total = SQL(count + is_active).as(scalar[Long].single)
 
-    val list = SQL(query + is_active + is_order + limitation).as(CourtRoomParser.courtRoomParser.*)
+    val list = SQL(query + is_active + is_active_monitor + is_order + limitation).as(CourtRoomParser.courtRoomParser.*)
 
     ListResult(list, page, Helpers.limit, total)
   }
