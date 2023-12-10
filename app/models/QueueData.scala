@@ -2,6 +2,7 @@ package models
 import anorm.SqlParser.scalar
 import anorm.{SQL, _}
 import parser.QueueParser
+import parser.QueueParser.queueSearchParser
 import play.api.db.DBApi
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Json, OFormat, _}
@@ -31,6 +32,11 @@ case class QueueJoin(
                   status: Int = 0
                     )
 
+case class QueueSearch(
+                      id: Long,
+                      queue_number: Int
+                      )
+
 class QueueData @Inject()(
                                  DBApi: DBApi,
                                  courtRoomData: CourtRoomData
@@ -49,6 +55,7 @@ class QueueData @Inject()(
   }
 
   implicit val queueFormat: OFormat[Queue] = Json.format[Queue]
+  implicit val queueSearchFormat: OFormat[QueueSearch] = Json.format[QueueSearch]
 
   import courtRoomData.courtRoomFormat
   implicit val queueJoinFormat: OFormat[QueueJoin] = Json.format[QueueJoin]
@@ -76,7 +83,8 @@ class QueueData @Inject()(
   def get(id: Long): Option[QueueJoin] = db.withConnection { implicit c =>
     val query: String =
       """
-        |SELECT * FROM queue q
+        |SELECT q.id AS id_queue, q.date, q.queue_number, q.id_court_room, q.call_time, q.pick_up_time,
+        |q.status, cr.* FROM queue q
         |JOIN court_room cr
         |ON (q.id_court_room = cr.id)
         |WHERE q.id = {id} """.stripMargin
@@ -112,12 +120,42 @@ class QueueData @Inject()(
     SQL(query).on("idCourtRoom" -> idCourtRoom, "dateNow" -> date).as(scalar[Int].singleOpt)
   }
 
+  def lastCall(idCourtRoom: Long, date: String = today): Option[QueueSearch] = db.withConnection{implicit c =>
+    val query: String =
+      """SELECT id, queue_number FROM queue
+        |WHERE id_court_room = {idCourtRoom} AND date = {dateNow}
+        |ORDER BY call_time DESC LIMIT 1
+        |""".stripMargin
+
+    SQL(query).on("idCourtRoom" -> idCourtRoom, "dateNow" -> date).as(queueSearchParser.singleOpt)
+  }
+
+  def searchQueueNumber(idCourtRoom: Long, queue_number: Int, search: String, date: String = today): Option[Int] = db.withConnection{implicit c =>
+
+    var q = ""
+    if(queue_number > -1){
+      search match{
+        case "next" => q += s" AND queue_number = ${queue_number + 1}"
+        case "prev" => q += s" AND queue_number = ${queue_number - 1}"
+        case _ => q += s" AND queue_number = ${queue_number}"
+      }
+    }
+
+
+    val query: String =
+      """SELECT id FROM queue
+        |WHERE id_court_room = {idCourtRoom} AND date = {dateNow}
+        |""".stripMargin
+
+    SQL(query + q).on("idCourtRoom" -> idCourtRoom, "dateNow" -> date).as(scalar[Int].singleOpt)
+  }
+
   def insert(queue: Queue): (Option[Any], String) = db.withConnection{ implicit c =>
     val data: Map[String, String] = Map (
       "date" -> Helpers.date2String(queue.date, "yyyy-MM-dd"),
       "queue_number" -> queue.queue_number.toString,
       "id_court_room" -> queue.id_court_room.toString,
-      "call_time" -> queue.pick_up_time.toString,
+      "call_time" -> (if(queue.call_time.isDefined) queue.call_time.toString else null),
       "pick_up_time" -> queue.pick_up_time.toString,
       "status" -> queue.status.toString
     )
@@ -130,8 +168,8 @@ class QueueData @Inject()(
       "date" -> Helpers.date2String(queue.date, "yyyy-MM-dd"),
       "queue_number" -> queue.queue_number.toString,
       "id_court_room" -> queue.id_court_room.toString,
-      "call_time" -> Helpers.date2String(queue.call_time.get, "yyyy-MM-dd HH:mm:ss"),
-      "pick_up_time" -> Helpers.date2String(queue.pick_up_time, "yyyy-MM-dd HH:mm:ss"),
+      "call_time" -> queue.call_time.orNull.toString,
+      "pick_up_time" -> queue.pick_up_time.toString,
       "status" -> queue.status.toString
     )
 
