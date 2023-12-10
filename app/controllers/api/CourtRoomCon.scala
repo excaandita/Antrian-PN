@@ -22,6 +22,7 @@ class CourtRoomCon @Inject()(
 
     val param: Map[String, String] = Map(
       "active_kiosk" -> Helpers.getData(request, "active_kiosk"),
+      "active_monitor" -> "",
       "order" -> Helpers.getData(request, "order")
     )
     val res: ListResult[CourtRoom] = courtRoomData.list(page, param)
