@@ -38,8 +38,9 @@ GET     /api/court_room/kiosk               controllers.api.CourtRoomCon.listKio
 # Queue
 #GET     /api/queue/list/:p                  controllers.api.QueueCon.list(p:Int)
 GET     /api/queue/get/:id                  controllers.api.QueueCon.get(id:Int)
+GET     /api/queue/get_by_param             controllers.api.QueueCon.getByParam()
 GET     /api/queue/get_queue                controllers.api.QueueCon.getQueue()
-GET     /api/queue/queue_number             controllers.api.QueueCon.searchQueue()
+GET     /api/queue/queue_number             controllers.api.QueueCon.queueNumberId()
 POST    /api/queue/order_queue              controllers.api.QueueCon.add()
 PUT     /api/queue/call_queue               controllers.api.QueueCon.callQueue()
 #DELETE  /api/queue/delete                   controllers.api.QueueCon.remove()

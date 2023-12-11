@@ -92,6 +92,18 @@ class QueueData @Inject()(
     SQL(query).on("id" -> id).as(QueueParser.queueJoinParser.singleOpt)
   }
 
+  def getByVal(idCourtRoom: Long, queueNum: Int, date: String = today): Option[QueueJoin] = db.withConnection { implicit c =>
+    val query: String =
+      """
+        |SELECT q.id AS id_queue, q.date, q.queue_number, q.id_court_room, q.call_time, q.pick_up_time,
+        |q.status, cr.* FROM queue q
+        |JOIN court_room cr
+        |ON (q.id_court_room = cr.id)
+        |WHERE q.id_court_room = {idCourtRoom} AND q.queue_number = {queueNum} AND date = {dateNow} """.stripMargin
+
+    SQL(query).on("idCourtRoom" -> idCourtRoom, "queueNum" -> queueNum,  "dateNow" -> date).as(QueueParser.queueJoinParser.singleOpt)
+  }
+
   def remainingQueue(idCourtRoom: Long, date: String = today): Int = db.withConnection { implicit c =>
     val query: String =
       """

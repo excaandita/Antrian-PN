@@ -45,7 +45,18 @@ class QueueCon @Inject()(cc: ControllerComponents,
     }
   }
 
-  def searchQueue(): Action[AnyContent] = Action{ implicit request: Request[AnyContent] =>
+  def getByParam(): Action[AnyContent] = Action{ implicit request: Request[AnyContent] =>
+    val idCourtRoom: String = Helpers.getData(request, "id_court_room")
+    val queueNum: Int = Helpers.getData(request, "queue_number").toInt
+    val res: Option[QueueJoin] = queueData.getByVal(idCourtRoom.toLong, queueNum)
+
+    res match {
+      case Some(res) => Res.success[QueueJoin]("Berhasil mendapatkan data queue.", res)
+      case None => Res.notFound("Data queue tidak ditemukan.")
+    }
+  }
+
+  def queueNumberId(): Action[AnyContent] = Action{ implicit request: Request[AnyContent] =>
     val idCourtRoom: String = Helpers.getData(request, "id_court_room")
 //    val search: String = Helpers.getData(request, "search")
 
