@@ -55,12 +55,15 @@ class QueueCon @Inject()(cc: ControllerComponents,
       case Some(res) => {
         val nextQueue: Option[Int] = queueData.searchQueueNumber(idCourtRoom.toLong, res.queue_number, "next")
         val prevQueue: Option[Int] = queueData.searchQueueNumber(idCourtRoom.toLong, res.queue_number, "prev")
+        val totalQueue: Int = queueData.totalQueue(idCourtRoom.toLong)
+
         Res.success[JsValue]("Berhasil mendapatkan data queue.",
           Json.obj(
             "queue_number" -> res.queue_number,
             "id_queue_next" -> nextQueue,
             "id_queue_prev" -> prevQueue,
             "id_queue_now" -> res.id,
+            "total_queue" -> totalQueue
           )
         )
       }
