@@ -10,7 +10,12 @@ import play.api.libs.EventSource
 import play.api.mvc._
 import play.api.libs.json._ 
 
-case class NotifDisplayMessage(no_antri: Int, id_court_room: String, sound: String)  
+case class NotifDisplayMessage(
+              no_antri: Int, 
+              id_court_room: String, 
+              sound: String, 
+              panggil: String
+                )  
 
 @Singleton
 class QueueRoomDisplayCon @Inject() (

@@ -123,13 +123,13 @@
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Nomor Antrian</label>
-                                            <input type="number" class="form-control" placeholder="Masukan Nomor antrian yang ingin dipanggil">
+                                            <input type="number" class="form-control" id="no_antri_manual" placeholder="Masukan Nomor antrian yang ingin dipanggil">
                                         </div>
                                     </div>
                                     <div class="col-sm-1">
                                         <div class="form-group">
                                             <label>Panggil</label>
-                                            <button type="submit" class="btn btn-success form-control"><i class="fas fa-volume-up"></i></button>
+                                            <button type="button" class="btn btn-success form-control" onClick="panggilManual()"><i class="fas fa-volume-up"></i></button>
                                         </div>
                                     </div>
                                 </div> 
@@ -169,6 +169,24 @@
     function reloadAntrian() {
         let id = $('#id_court_room').val();
         getQueuePanggil(id);
+    }
+
+    function panggilManual() {
+        let idCourtRoom = $('#id_court_room_manual').val();
+        let numberQueue = $('#no_antri_manual').val();
+
+        if(numberQueue == 0 || numberQueue == null) {
+            Swal.fire({
+                icon: "info",
+                title: "Oops...",
+                text: "Antrian tidak boleh 0",
+            });
+            return false; 
+        } else {
+            panggilAntrianManual(idCourtRoom, numberQueue);
+            $('#no_antri_manual').val('');
+        }
+
     }
 
     function getQueuePanggil(id){
@@ -289,11 +307,74 @@
                     cache: true,
                     dataType: 'json',
                     contentType: "application/json; charset=utf-8",
-                    success: function(data) {
-                        console.log(data);
-                    },
-                    error: function(e){
-                        console.log(e);
+                    complete: function(xhr, status) {
+                        $(document).Toasts('create', {
+                            title: 'Berhasil!!',
+                            class: 'bg-success',
+                            autohide: true,
+                            delay: 1000,
+                            body: 'Antrian : '+res.data.queue+' Berhasil Terpanggil'
+                        })
+                    }
+                })
+                
+            },
+            error: function(e){
+                if(e.data == undefined){
+                    Swal.fire({
+                        icon: "info",
+                        title: "Oops...",
+                        text: "Antrian Tidak Ada!!",
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e.responseText,
+                    });
+                }
+            }
+        })
+    }
+
+    function panggilAntrianManual(idCourtRoom, number){
+        let jsonManual = {
+            'id_court_room': idCourtRoom,
+            'queue_number': number,
+        }
+
+        $.ajax({
+            type: 'GET',
+            url: 'api/queue/get_by_param',
+            data: '&id_court_room='+idCourtRoom+'&queue_number='+number,
+            cache: true,
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            success: function(res){
+                console.log(res);
+                
+                let jsonPush = {
+                    'no_antri': parseInt(res.data.queue_number),
+                    'file_sound': res.data.court_room.file_sound,
+                    'id_court_room': res.data.id_court_room,
+                    'panggil': 'ya',
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'queue/push_display',
+                    data: JSON.stringify(jsonPush),
+                    cache: true,
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    complete: function(xhr, status) {
+                        $(document).Toasts('create', {
+                            title: 'Berhasil!!',
+                            class: 'bg-success',
+                            autohide: true,
+                            delay: 1000,
+                            body: 'Antrian : '+res.data.queue_number+' Berhasil Terpanggil'
+                        })
                     }
                 })
                 
