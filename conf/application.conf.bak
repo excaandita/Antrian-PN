@@ -11,3 +11,7 @@ db.antrian_pn.driver=com.mysql.jdbc.Driver
 db.antrian_pn.url="jdbc:mysql://"
 db.antrian_pn.username=
 db.antrian_pn.password=""
+
+app{
+  soundDir = "/var/www/antrian/"
+}
