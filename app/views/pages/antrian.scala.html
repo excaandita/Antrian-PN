@@ -41,7 +41,7 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label>Ruang Sidang</label>
+                                            <label>Ruang Sidang <button type="button" class="btn btn-default btn-xs" onClick="reloadAntrian()"><i class="fas fa-sync"></i></button></label>
                                             <select class="form-control" id="id_court_room">
                                                 <option selected value="">Pilih...</option>
                                                 @for(v <- courtRoomList) {
@@ -112,10 +112,10 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Total Antrian</label>
-                                            <input type="text" class="form-control-plaintext" id="total_antrian_manual" placeholder="-" disabled>
+                                            <input type="text" class="form-control text-center" id="total_antrian_manual" placeholder="-" disabled>
                                         </div>
                                     </div>
                                 </div>
@@ -166,6 +166,11 @@
 
     });
 
+    function reloadAntrian() {
+        let id = $('#id_court_room').val();
+        getQueuePanggil(id);
+    }
+
     function getQueuePanggil(id){
         $.ajax({
             type: 'GET',
@@ -210,7 +215,7 @@
             success: function(res){
                 console.log(res);
                 
-                $('#total_antrian_manual').val(res.data.queue_number)
+                $('#total_antrian_manual').val(res.data.total_queue)
 
             },
             error: function(e){
@@ -222,7 +227,7 @@
                     });
 
                     manageButtonPanggil(null, null, null);
-                    $('#total_antrian_manual').html('0')
+                    $('#total_antrian_manual').val('0')
 
                 } else {
             

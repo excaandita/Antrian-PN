@@ -113,7 +113,7 @@
             cursor: pointer;
 
             font-family: Poppins;
-            font-size: 100px; 
+            font-size: 90px; 
             font-style: normal; 
             font-weight: 1000; 
             line-height: 100%;  
@@ -186,10 +186,10 @@
                     <div class="col-lg-5    ">
                         <div class="box-antrian">
                             @for(v <- courtRoomList) {
-                                <div class="item" id="ruang_@v.courtRoom.id">
+                                <div class="item d-none" id="ruang_@v.courtRoom.id">
                                     <div class="example1">
                                         <div class="nama-ruang-sidang" id="nama_ruang" style="line-height:30px">@v.courtRoom.description</div>
-                                        <div class="ic-ruang-sidang" id="queue_@v.courtRoom.id">0</div>
+                                        <div class="ic-ruang-sidang" id="queue_@v.courtRoom.id">000</div>
                                     </div>
                                 </div>
                             }
@@ -229,7 +229,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModalCluster()"></button>
                 </div>
                 <div class="modal-body">
-                    <select class="form-control selectpicker" multiple="multiple" data-live-search="true" id="set_ruang" title="Pilih Ruang">
+                    <select class="form-control selectpicker" multiple="multiple" id="set_ruang" title="Pilih Ruang">
                         @for(v <- courtRoomList) {
                             <option value="ruang_@v.courtRoom.id">@v.courtRoom.description</option>
                         }
@@ -327,22 +327,21 @@
 
             templatePlugins.init();
 
-            $('#set_ruang').on('change', function() {
+            $('#set_ruang').change(function() {
                 var ruang = $('#set_ruang').val();
-                var now = JSON.parse(localStorage.getItem("ruangMonitor"));
                 // Check browser support
                 if (typeof(Storage) !== "undefined") {
                     if (now != null) {
                         localStorage.removeItem("ruangMonitor");
                     }
                     // Store
+                    $('.item').addClass('d-none');
                     localStorage.setItem("ruangMonitor", JSON.stringify(ruang));
                 } 
+                var now = JSON.parse(localStorage.getItem("ruangMonitor"));
                 now.forEach(element => { 
                     $('#'+element).removeClass("d-none");
                 });
-
-                console.log(now)
             });
 
         });
@@ -358,15 +357,21 @@
             if(number > 0 && nyala == true){
                 var item = number+'#'+id_court_room+'#'+sound;
                 console.log(item);
+
+                var storageNow = JSON.parse(localStorage.getItem("ruangMonitor"));
+                console.log(storageNow.includes("ruang_"+id_court_room) == true);
                 // display antrian dan cookie
-                manage_display(number, id_court_room);
-                // enqueue an item
-                queue.enqueue(item);
-                static_queue.enqueue(item);
-                var static_length = static_queue.getLength();
-                var length = queue.getLength();
-                if (static_length == 1) {
-                    ambil_antrian();
+                if (storageNow.includes("ruang_"+id_court_room) == true) {
+                    // display antrian dan cookie
+                    manage_display(number, id_court_room);
+                    // enqueue an item
+                    queue.enqueue(item);
+                    static_queue.enqueue(item);
+                    var static_length = static_queue.getLength();
+                    var length = queue.getLength();
+                    if (static_length == 1) {
+                        ambil_antrian();
+                    }
                 }
             }
         }
@@ -542,9 +547,9 @@
             });
         }
 
-        function manage_display(no_antri) {
+        function manage_display(no_antri, id_court_room) {
             $('#no_antri').html(pad(no_antri, 3));
-            $(`#queue_${kd_poli}`).html(pad(no_antri, 3));
+            $(`#queue_${id_court_room}`).html(pad(no_antri, 3));
         }
 
         function pad(number, length) {
