@@ -92,6 +92,34 @@ class QueueData @Inject()(
     SQL(query).on("id" -> id).as(QueueParser.queueJoinParser.singleOpt)
   }
 
+  def getDashboard(date: String = today) = db.withConnection { implicit c =>
+    val queryTotal: String =
+    """
+      |SELECT COUNT(id) FROM queue q 
+      |WHERE q.date = {date}
+    """.stripMargin
+    val total = SQL(queryTotal).on("date" -> date).as(scalar[Int].single)
+
+    val queryRemaining: String =
+    """
+      |SELECT COUNT(id) FROM queue q
+      |WHERE q.date = {date} and q.status = 0
+    """.stripMargin
+
+    val remaining = SQL(queryRemaining).on("date" -> date).as(scalar[Int].single)
+
+    val queryCalled: String =
+    """
+      |SELECT COUNT(id) FROM queue q
+      |WHERE q.date = {date} and q.status = 1
+    """.stripMargin
+
+    val called = SQL(queryCalled).on("date" -> date).as(scalar[Int].single)
+
+    (total, remaining, called)
+
+  }
+
   def getByVal(idCourtRoom: Long, queueNum: Int, date: String = today): Option[QueueJoin] = db.withConnection { implicit c =>
     val query: String =
       """

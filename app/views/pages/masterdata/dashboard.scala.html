@@ -26,7 +26,7 @@
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3>150</h3>
+                <h3 id="antrian_total">0</h3>
 
                 <p>Antrian Hari Ini</p>
               </div>
@@ -40,7 +40,7 @@
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>53</h3>
+                <h3 id="antrian_terpanggil">53</h3>
 
                 <p>Antrian Terpanggil</p>
               </div>
@@ -54,7 +54,7 @@
             <!-- small box -->
             <div class="small-box bg-warning">
               <div class="inner">
-                <h3>44</h3>
+                <h3 id="antrian_belum_terpanggil">44</h3>
 
                 <p>Antrian Belum dipanggil</p>
               </div>
@@ -79,3 +79,39 @@
     </section>
     <!-- /.content -->
   </div>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+        getAntrian();                    
+    })
+
+    function getAntrian() {
+      todayDate = dateNowFormat();
+
+      $.ajax({
+        type: 'GET',
+            url: 'api/dashboard',
+            data: '&date='+todayDate,
+            cache: true,
+            success: function(data) {
+              console.log(data.data);
+
+              $('#antrian_total').html(data.data.total)
+              $('#antrian_terpanggil').html(data.data.called)
+              $('#antrian_belum_terpanggil').html(data.data.remaining)
+            }
+      })
+    }
+
+    function dateNowFormat() {
+      let today = new Date();
+      var yyyy = today.getFullYear().toString();
+      var mm = (today.getMonth()+1).toString();
+      var dd  = today.getDate().toString();
+
+      var mmChars = mm.split('');
+      var ddChars = dd.split('');
+
+      return yyyy + '-' + (mmChars[1]?mm:"0"+mmChars[0]) + '-' + (ddChars[1]?dd:"0"+ddChars[0]);
+    }
+  </script>

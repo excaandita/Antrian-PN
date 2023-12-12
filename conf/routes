@@ -20,6 +20,9 @@ GET     /cetak_antrian             controllers.HomeController.cetak()
 
 # API
 
+# Dashboard
+GET     /api/dashboard                      controllers.api.DashboardCon.get(date: String)
+
 # Running Text
 GET     /api/running_text/list/:p           controllers.api.RunningTextCon.list(p: Int)
 GET     /api/running_text/get/:id           controllers.api.RunningTextCon.get(id:Int)
