@@ -63,7 +63,7 @@
             margin: 15px;
             padding: 15px;
             box-shadow: 8px 8px 3px 0px rgba(0, 0, 0, 0.30);
-            height: 67vh;
+            height: 70vh;
         }
 
         .box-antrian {
@@ -79,7 +79,7 @@
             -ms-overflow-style: none; /* for Internet Explorer, Edge */
             scrollbar-width: none; /* for Firefox */
             box-shadow: 8px 8px 3px 0px rgba(0, 0, 0, 0.30);
-            height: 67vh;
+            height: 70vh;
         }
 
         .container {
@@ -94,9 +94,9 @@
         .item {
             flex: 0 0 calc(50% - 2%);
             color: white;
-            padding: 20px;
+            padding: 10px;
             margin: 5px;
-            height: 20vh;
+            height: 21vh;
             text-align: center;
             cursor: pointer;
             border-radius: 10px;
@@ -106,18 +106,18 @@
 
         .ic-ruang-sidang {
             width: 10rem;
-            height: 6rem;
+            height: 4rem;
             text-align: center;
             display: block;
             margin: 1rem auto 1rem auto;
             cursor: pointer;
 
             font-family: Poppins;
-            font-size: 90px; 
+            font-size: 75px; 
             font-style: normal; 
             font-weight: 1000; 
             line-height: 100%;  
-            text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.40);
+            text-shadow: 6px 6px 6px rgba(0, 0, 0, 0.507);
             
         }
 
@@ -125,11 +125,26 @@
             
             font-style: normal;
             font-weight: 700;
-            font-size: 30px;
+            font-size: 23px;
             line-height: 20px;
             cursor: pointer;
             color: white;
             text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.56);
+            width: 100%;
+            padding: 0 5px;
+            display: block;
+            padding:8px
+        }
+
+        .nama-loket {
+            
+            font-style: normal;
+            font-weight: 700;
+            font-size: 30px;
+            line-height: 20px;
+            cursor: pointer;
+            color: white;
+            text-shadow: 6px 6px 6px rgba(0, 0, 0, 0.507);
             width: 100%;
             padding: 0 5px;
             display: block;
@@ -188,8 +203,9 @@
                             @for(v <- courtRoomList) {
                                 <div class="item d-none" id="ruang_@v.courtRoom.id">
                                     <div class="example1">
-                                        <div class="nama-ruang-sidang" id="nama_ruang" style="line-height:30px">@v.courtRoom.description</div>
+                                        <div class="nama-loket" id="nama_ruang" style="line-height:30px">Loket @v.courtRoom.name</div>
                                         <div class="ic-ruang-sidang" id="queue_@v.courtRoom.id">000</div>
+                                        <div class="nama-ruang-sidang" id="nama_ruang" style="line-height:30px">@v.courtRoom.description</div>
                                     </div>
                                 </div>
                             }
@@ -225,13 +241,13 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Pengaturan Ruang</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Pengaturan Loket</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModalCluster()"></button>
                 </div>
                 <div class="modal-body">
                     <select class="form-control selectpicker" multiple="multiple" id="set_ruang" title="Pilih Ruang">
                         @for(v <- courtRoomList) {
-                            <option value="ruang_@v.courtRoom.id">@v.courtRoom.description</option>
+                            <option value="ruang_@v.courtRoom.id">Loket @v.courtRoom.name ( @v.courtRoom.description )</option>
                         }
                     </select>
                     <div id="result"></div>
@@ -308,6 +324,10 @@
             });
 
             var storageNow = JSON.parse(localStorage.getItem("ruangMonitor"));
+            if(storageNow == null) {
+                localStorage.setItem("ruangMonitor", "[]");
+            }
+
             $('.selectpicker').val(storageNow).attr('selected','selected');
             storageNow.forEach(element => { 
                 $('#'+element).removeClass("d-none");
@@ -320,7 +340,7 @@
                 console.log(obj);
 
                 if(obj.panggil == 'ya'){
-                    panggil_antrian(obj.no_antri, obj.id_court_room, obj.file_sound);
+                    panggil_antrian(obj.no_antri, obj.id_court_room, obj.file_sound, obj.loket);
                 }
                 
             }, false);
@@ -353,13 +373,12 @@
             $('#modal_cluster').modal('hide');
         }
 
-        function panggil_antrian(number, id_court_room, sound){
+        function panggil_antrian(number, id_court_room, sound, loket){
             if(number > 0 && nyala == true){
-                var item = number+'#'+id_court_room+'#'+sound;
+                var item = number+'#'+id_court_room+'#'+sound+'#'+loket;
                 console.log(item);
 
                 var storageNow = JSON.parse(localStorage.getItem("ruangMonitor"));
-                console.log(storageNow.includes("ruang_"+id_court_room) == true);
                 // display antrian dan cookie
                 if (storageNow.includes("ruang_"+id_court_room) == true) {
                     // display antrian dan cookie
@@ -394,8 +413,8 @@
             console.log(length+' ambil_antrian2');
 
             if (length > 0) {
-                console.log(audio[0]+', '+audio[1]+', '+audio[2]);
-                play_antrian(audio[0],audio[1],audio[2]);
+                console.log(audio[0]+', '+audio[1]+', '+audio[2]+', '+audio[3]);
+                play_antrian(audio[0],audio[1],audio[2],audio[3]);
 
                 queue.dequeue();
             }else{
@@ -407,7 +426,7 @@
             }
         }
 
-        function play_antrian(number, court_room, sound) {
+        function play_antrian(number, court_room, sound, loket) {
             // var next_antrian = true;
             if(number >= 0){
             	var words = "";
@@ -485,22 +504,23 @@
 	                    array[i] = arr_number[parseInt(value)];
 	                }); 
 	            }
-	           	var nilai = text_speech(array, (array.length - 1), sound, court_room);
+	           	var nilai = text_speech(array, (array.length - 1), sound, court_room, loket);
             }
         }
 
-        function text_speech(myArray, last, sound, court_room) {
-            text_speech_court_room(myArray, last, sound, court_room);
+        function text_speech(myArray, last, sound, court_room, loket) {
+            text_speech_court_room(myArray, last, sound, court_room, loket);
         }
 
-        function text_speech_court_room(myArray, last, sound, court_room) {
+        function text_speech_court_room(myArray, last, sound, court_room, loket) {
             if(myArray != undefined){
                 // untuk awalan
                 const end = new Audio('/api/speech/audio/end.mp3');
                 const start = new Audio('/api/speech/audio/start.mp3');
+                const nomor_loket = new Audio('/api/speech/audio/'+ loket +'.mp3')
                 const nomor_antrian = new Audio('/api/speech/audio/nomor_antrian.mp3');
-                const poli = new Audio('/api/speech/audio/' + sound);
-                const silahkan = new Audio('/api/speech/audio/silahkan_menuju.mp3');
+                const court_room = new Audio('/api/speech/audio/' + sound);
+                const silahkan = new Audio('/api/speech/audio/silahkan_menuju_ke_loket.mp3');
 
                 start.addEventListener('ended', function(){
                     nomor_antrian.play();
@@ -513,17 +533,22 @@
                     myArray[0].play();
                 });
                 
-                // untuk 'silahkan menuju ke'
+                // untuk 'silahkan menuju ke loket'
                 myArray[last].addEventListener('ended', function(){
                     silahkan.play();
                 });
 
-                // untuk 'nama poli'
+
+                // untuk 'nomor loket'
                 silahkan.addEventListener('ended', function(){
-                    poli.play();
+                    nomor_loket.play();
                 });
 
-                poli.addEventListener('ended', function(){
+                nomor_loket.addEventListener('ended', function(){
+                    court_room.play();
+                });
+
+                court_room.addEventListener('ended', function(){
                     end.play();
                 });
 

@@ -41,11 +41,11 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label>Ruang Sidang <button type="button" class="btn btn-default btn-xs" onClick="reloadAntrian()"><i class="fas fa-sync"></i></button></label>
+                                            <label>Loket <button type="button" class="btn btn-default btn-xs" onClick="reloadAntrian()"><i class="fas fa-sync"></i></button></label>
                                             <select class="form-control" id="id_court_room">
                                                 <option selected value="">Pilih...</option>
                                                 @for(v <- courtRoomList) {
-                                                    <option value="@v.courtRoom.id">@v.courtRoom.description</option>
+                                                    <option value="@v.courtRoom.id">@v.courtRoom.name ( @v.courtRoom.description )</option>
                                                 }
                                             </select>
                                         </div>
@@ -103,11 +103,11 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label>Ruang Sidang</label>
+                                            <label>Loket</label>
                                             <select class="form-control" id="id_court_room_manual">
                                                 <option selected value="">Pilih...</option>
                                                 @for(v <- courtRoomList) {
-                                                    <option value="@v.courtRoom.id">@v.courtRoom.description</option>
+                                                    <option value="@v.courtRoom.id">@v.courtRoom.name ( @v.courtRoom.description )</option>
                                                 }
                                             </select>
                                         </div>
@@ -297,6 +297,7 @@
                     'no_antri': parseInt(res.data.queue),
                     'file_sound': res.data.court_room.file_sound,
                     'id_court_room': res.data.court_room.id,
+                    'loket': res.data.court_room.name,
                     'panggil': 'ya',
                 }
 
@@ -358,6 +359,7 @@
                     'no_antri': parseInt(res.data.queue_number),
                     'file_sound': res.data.court_room.file_sound,
                     'id_court_room': res.data.id_court_room,
+                    'loket': res.data.court_room.name,
                     'panggil': 'ya',
                 }
 

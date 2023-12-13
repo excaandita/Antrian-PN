@@ -14,6 +14,7 @@ case class NotifDisplayMessage(
               no_antri: Int, 
               id_court_room: String, 
               sound: String, 
+              loket: String, 
               panggil: String
                 )  
 
