@@ -56,10 +56,18 @@
           </ul>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="show_page('', 'Antrian','/queue','fas fa-th')">
+          <a class="nav-link" onclick="show_page('', 'Rekap Antrian','/queue_list','fas fa-th')">
+            <i class="nav-icon fas fa-book"></i>
+            <p>
+              Rekap Antrian
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="show_page('', 'Pemanggilan Antrian','/queue','fas fa-th')">
             <i class="nav-icon fas fa-th"></i>
             <p>
-              Antrian
+              Pemanggilan Antrian
               <span class="right badge badge-danger">!</span>
             </p>
           </a>
@@ -104,20 +112,13 @@
           menuOpen.removeClass('menu-is-opening')
           menuOpen.removeClass('menu-open')
         }else{
-          console.log($('ul.nav-treeview').siblings().find($(`p#${module}`)).parents('li').addClass('menu-is-opening menu-open'))
+          $('ul.nav-treeview').siblings().find($(`p#${module}`)).parents('li').addClass('menu-is-opening menu-open')
         }
 
         // add active class
         const navItems = $ul.find($('li.nav-item'))
             navItems.find($(`p:contains(${title})`)).parent().addClass('active')
 
-        //var $ul = $('.nav.side-menu');
-        //console.log($('body').hasClass('nav-sm'))
-        //if ($('body').hasClass('nav-sm') && $ul.find($('li.active')).length) {
-          //  var $active_li = $ul.find($('li.active'))
-            //$($active_li.children()[1]).slideUp();
-            //$active_li.removeClass('active');
-        //}
     }
 
     function gotohome() {

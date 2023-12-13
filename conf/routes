@@ -12,6 +12,7 @@ GET     /running_text               controllers.HomeController.runningText()
 GET     /court_room                 controllers.HomeController.courtRoom()
 GET     /queue                      controllers.HomeController.queue()
 GET     /video                      controllers.HomeController.video()
+GET     /queue_list                 controllers.HomeController.queue_list()
 
 GET     /kiosk                      controllers.HomeController.kiosk()
 GET     /display                    controllers.HomeController.display()
@@ -39,7 +40,7 @@ DELETE  /api/court_room/delete              controllers.api.CourtRoomCon.remove(
 GET     /api/court_room/kiosk               controllers.api.CourtRoomCon.listKiosk()
 
 # Queue
-#GET     /api/queue/list/:p                  controllers.api.QueueCon.list(p:Int)
+GET     /api/queue/list/:p                  controllers.api.QueueCon.list(p:Int)
 GET     /api/queue/get/:id                  controllers.api.QueueCon.get(id:Int)
 GET     /api/queue/get_by_param             controllers.api.QueueCon.getByParam()
 GET     /api/queue/get_queue                controllers.api.QueueCon.getQueue()

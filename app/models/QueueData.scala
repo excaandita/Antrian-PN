@@ -60,22 +60,37 @@ class QueueData @Inject()(
   import courtRoomData.courtRoomFormat
   implicit val queueJoinFormat: OFormat[QueueJoin] = Json.format[QueueJoin]
 
-  def list(page: Int = 0, active: String = "active"): ListResult[Queue] = db.withConnection{ implicit c =>
+  def list(page: Int, search: Map[String, String]): ListResult[QueueJoin] = db.withConnection{ implicit c =>
     val startRow = Helpers.start(page)
     val limitation = (if (page > 0) s" LIMIT ${Helpers.limit} OFFSET ${startRow} " else "")
 
-    val is_active: String = active match {
-      case "active" => " WHERE status = 1 "
-      case "inactive" => " WHERE status = 0 "
-      case _ => " "
+    var q: String = ""
+
+    if(search("start_date").nonEmpty && search("end_date").nonEmpty){
+      q += Helpers.dateBetween("pick_up_time", search("start_date"), search("end_date"))
     }
 
-    val query: String = "SELECT * FROM queue "
+    if(search("id_court_room").nonEmpty){
+      q += s" AND q.id_court_room = ${search("id_court_room")} "
+    }
+
+    if(search("status").nonEmpty){
+      q += s" AND q.status = ${search("status")} "
+    }
+
+    val order = " ORDER BY date DESC, queue_number"
+    val query: String =
+      """SELECT q.id AS id_queue, q.date, q.queue_number, q.id_court_room, q.call_time, q.pick_up_time,
+        |q.status, cr.* FROM queue q
+        |JOIN court_room cr
+        |ON (q.id_court_room = cr.id)
+        |WHERE q.id IS NOT NULL
+        |""".stripMargin
 
     val count = "SELECT COUNT(*) FROM queue "
-    val total = SQL(count + is_active).as(scalar[Long].single)
+    val total = SQL(count ).as(scalar[Long].single)
 
-    val list = SQL(query + is_active + limitation).as(QueueParser.queueParser.*)
+    val list = SQL(query + q + order + limitation).as(QueueParser.queueJoinParser.*)
 
     ListResult(list, page, Helpers.limit, total)
   }

@@ -16,12 +16,17 @@ class QueueCon @Inject()(cc: ControllerComponents,
   import courtRoomData.courtRoomFormat
   import queueData.{queueFormat, queueJoinFormat}
 
-  def list(page: Int): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    val active: String = Helpers.getData(request, "active")
-    val res: ListResult[Queue] = queueData.list(page, active)
+  def list(page: Int = 0): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    val search: Map[String, String] = Map(
+      "start_date" -> Helpers.getData(request, "start_date"),
+      "end_date" -> Helpers.getData(request, "end_date"),
+      "id_court_room" -> Helpers.getData(request, "id_court_room"),
+      "status" -> Helpers.getData(request, "status")
+    )
+    val res: ListResult[QueueJoin] = queueData.list(page, search)
 
     if (res.total > 0) {
-      Res.successWithPage[Queue](res, page, "Queue")
+      Res.successWithPage[QueueJoin](res, page, "Queue")
     } else NoContent
   }
   def get(id: Int): Action[AnyContent] = Action{

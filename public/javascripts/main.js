@@ -764,7 +764,7 @@ function page_summary(total_data, total_datapage,limit, page){
     if (finish < 1) {
         start = 0;
     };
-    var str = 'Showing '+start+' to '+finish+' of '+total_data+' entries';
+    var str = 'Menunjukkan '+start+' - '+finish+' dari '+total_data+' data';
 
     return str;
 }

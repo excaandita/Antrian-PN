@@ -1,7 +1,6 @@
 package controllers
 
-import controllers.transactions.KioskTrx
-import controllers.transactions.{DisplayCourt, DisplayTrx}
+import controllers.transactions.{DisplayCourt, DisplayTrx, KioskTrx}
 import models.{QueueData, RunningText, RunningTextData}
 import play.api._
 import play.api.mvc._
@@ -80,6 +79,12 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
     val queue_left: String = Helpers.getData(request, "queue_left")
 
     Ok(views.html.printing.cetak_antrian(queue_number, date_now, court_room_name, queue_left))
+  }
+
+//  REKAP ANTRIAN
+  def queue_list: Action[AnyContent] = Action {
+    Ok(views.html.pages.queue_list())
+
   }
 
 }
