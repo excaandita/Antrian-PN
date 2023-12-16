@@ -29,6 +29,18 @@
             font-family: 'Poppins';
             padding: 0;
         }
+        .blinker {
+            -webkit-animation-name: blinker;  
+            -webkit-animation-iteration-count: infinite;  
+            -webkit-animation-timing-function: cubic-bezier(1.0,0,0,1.0);
+            -webkit-animation-duration: 1s; 
+        }
+
+        @@-webkit-keyframes blinker {
+            0% { opacity: 1.0; }
+            50% { opacity: 0.0; }
+            100% { opacity: 1.0; }
+        }
 
         .font-primary{
             color: #FFFFFF;
@@ -573,8 +585,13 @@
         }
 
         function manage_display(no_antri, id_court_room) {
-            $('#no_antri').html(pad(no_antri, 3));
             $(`#queue_${id_court_room}`).html(pad(no_antri, 3));
+            $(`#queue_${id_court_room}`).addClass('blinker');
+
+            // Menghapus kelas 'blinker' setelah 10 detik (5 detik setelah ditambahkan)
+            window.setTimeout(function() {
+                $(`#queue_${id_court_room}`).removeClass('blinker');
+            }, 10000);
         }
 
         function pad(number, length) {

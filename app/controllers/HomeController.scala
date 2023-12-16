@@ -83,7 +83,9 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
 
 //  REKAP ANTRIAN
   def queue_list: Action[AnyContent] = Action {
-    Ok(views.html.pages.queue_list())
+    val court_room_list: List[DisplayCourt] = displayTrx.list()
+
+    Ok(views.html.pages.queue_list(court_room_list))
 
   }
 

@@ -1,3 +1,6 @@
+@import controllers.transactions.DisplayCourt
+@(courtRoomList: List[DisplayCourt])
+
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -29,7 +32,8 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between">
                             <div class="input-group justify-content-start">
-                                <button type="button" class="btn btn-default " onclick="reload()"><i class="fas fa-sync"></i> &nbsp;Reload</button>
+                                <button type="button" class="btn btn-default mr-1" onclick="reload()"><i class="fas fa-sync"></i> &nbsp;Reload</button>
+                                <button type="button" class="btn btn-primary " id="btn_search"><i class="fas fa-search"></i> &nbsp;search</button>
                             </div>
                         </div>
 
@@ -42,6 +46,8 @@
                                     <th class="text-center">Tanggal</th>
                                     <th class="text-center">No. Antrian</th>
                                     <th class="text-center">Loket</th>
+                                    <th class="text-center">Nama Loket</th>
+                                    <th class="text-center">Waktu Ambil</th>
                                     <th class="text-center">Waktu Panggil</th>
                                     <th class="text-center">Status</th>
                                 </tr>
@@ -82,13 +88,71 @@
         <!-- /.container-fluid -->
     </section>
     <!-- /.content -->
+    <div class="modal" tabindex="-1" id="modal_search">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pencarian</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="formadd_court_room" class="form-horizontal form-label-left">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="id" value="" class="inputfield form-control" /> 
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="awal">Tgl awal</label>
+                                <input type="text" class="form-control" name="tanggal" id="tanggal_search" value="" />
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="form_text">Loket</label>
+                            <select class="form-control" id="form_status" name="loket" id="loket_search">
+                                <option selected value="">Pilih...</option>
+                                @for(v <- courtRoomList) {
+                                    <option value="@v.courtRoom.id">@v.courtRoom.name ( @v.courtRoom.description )</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="form_status">Status Terpanggil</label>
+                            <select class="form-control" id="form_status" name="status" id="status_search">
+                                <option selected value="">Semua...</option>
+                                <option value="1">Sudah</option>
+                                <option value="0">Belum</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Batal</button>
+                    <button type="submit" class="btn btn-primary" onclick="saveData()"><i class="fa fa-save"></i> Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">
     $(document).ready(function() {
-      //hit api get list
-      $('#page').val(1)
-      getQueueList(1);
+        //hit api get list
+        $('#page').val(1)
+        getQueueList(1);
+
+        $('#btn_search').click(function() {
+            $('#modal_search').modal('show');
+        });
+
+        $('input[name="tanggal"]').daterangepicker({
+            opens: 'left',
+            locale: {
+                format: 'DD/MM/YYYY',
+            }
+        }, function(start, end, label) {
+            console.log("A new date selection was made: " + start.format('DD-MM-YYYY') + ' to ' + end.format('DD-MM-YYYY'));
+        });
     });
 
     function getQueueList(page){
@@ -114,9 +178,11 @@
                         <td class="text-center">${datetime2date(timemilisFormat(v.date, false))}</td>
                         <td class="text-center">${v.queue_number}</td>
                         <td class="text-center">${v.court_room?.name}
-                        <td class="text-center">${datetime2date(timemilisFormat(v.pick_up_time, false))}</td>
+                        <td class="text-center">${v.court_room?.description}
+                            <td class="text-center">${timemilisFormat(v.pick_up_time, true)}</td>
+                            <td class="text-center">${v.status == 0 ? '-' : timemilisFormat(v.call_time, true)}</td>
                         <td class="text-center">
-                            <span class="right badge badge-${v.status ? "primary":"secondary"}">
+                            <span class="right badge badge-${v.status ? "success":"secondary"}">
                                     ${v.status ? "Sudah ":"Belum "} Terpanggil
                             </span>
                         </td>

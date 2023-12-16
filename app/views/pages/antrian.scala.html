@@ -151,15 +151,23 @@
 <script type="text/javascript">
     $(document).ready(function() {
 
+        var storage_courtRoom = JSON.parse(localStorage.getItem("courtRoom"));
+        var storage_courtRoomManual = JSON.parse(localStorage.getItem("courtRoomManual"));
+
+        $('#id_court_room').val(storage_courtRoom)
+        $('#id_court_room_manual').val(storage_courtRoomManual)
+
+       
         $('#id_court_room').change(function(){
             let id = $('#id_court_room').val();
-
+            localStorage.setItem("courtRoom", id);
+            
             getQueuePanggil(id);
-
         });
 
         $('#id_court_room_manual').change(function(){
             let id_manual = $('#id_court_room_manual').val();
+            localStorage.setItem("courtRoomManual", id_manual);
 
             getQueuePanggilManual(id_manual);
         });

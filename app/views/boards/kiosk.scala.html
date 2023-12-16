@@ -321,11 +321,6 @@
                 success: function(res){
                     hideLoading();
                     printAntrian(res.data);
-                    Swal.fire({
-                        icon: "success",
-                        title: "Antrian berhasil dibuat",
-                        text: "Silahkan ambil karcis dan menunggu antrian anda",
-                    });
                     getListKiosk()
 
                 },
