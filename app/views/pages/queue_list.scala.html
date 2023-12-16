@@ -1,8 +1,42 @@
 @import controllers.transactions.DisplayCourt
 @(courtRoomList: List[DisplayCourt])
 
+<style>
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .loading-spinner {
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+</style>
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -32,8 +66,8 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between">
                             <div class="input-group justify-content-start">
-                                <button type="button" class="btn btn-default mr-1" onclick="reload()"><i class="fas fa-sync"></i> &nbsp;Reload</button>
-                                <button type="button" class="btn btn-primary " id="btn_search"><i class="fas fa-search"></i> &nbsp;search</button>
+                                <button type="button" class="btn btn-primary mr-1" id="btn_search"><i class="fas fa-search"></i> &nbsp;search</button>
+                                <button type="button" class="btn btn-default" id="btn_reload"><i class="fas fa-sync"></i> &nbsp;Reload</button>
                             </div>
                         </div>
 
@@ -54,17 +88,6 @@
                                 </thead>
                                 <tbody id="court_room_list">
                                 </tbody>
-<!--                                <tbody id="loading_queue_list">-->
-<!--                                <tr>-->
-<!--                                    <td colspan="6">-->
-<!--                                        <div class="text-center">-->
-<!--                                            <div class="spinner-border" role="status">-->
-<!--                                                <span class="sr-only">Loading...</span>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-<!--                                    </td>-->
-<!--                                </tr>-->
-<!--                                </tbody>-->
                             </table>
                         </div>
 
@@ -74,13 +97,6 @@
                                 <div id="page_summary"></div>
                                 <div id="pagination" class="pagination"></div>
                             </div>
-<!--                            <ul class="pagination pagination-sm m-0 float-right">-->
-<!--                                <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>-->
-<!--                                <li class="page-item"><a class="page-link" href="#">1</a></li>-->
-<!--                                <li class="page-item"><a class="page-link" href="#">2</a></li>-->
-<!--                                <li class="page-item"><a class="page-link" href="#">3</a></li>-->
-<!--                                <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>-->
-<!--                            </ul>-->
                         </div>
                 </section>
             </div>
@@ -97,19 +113,17 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="formadd_court_room" class="form-horizontal form-label-left">
+                <form id="form_search" class="form-horizontal form-label-left">
                     <div class="modal-body">
-                        <input type="hidden" name="id" id="id" value="" class="inputfield form-control" /> 
                         <div class="form-row">
                             <div class="form-group col-md-12">
-                                <label for="awal">Tgl awal</label>
+                                <label for="awal">Tanggal</label>
                                 <input type="text" class="form-control" name="tanggal" id="tanggal_search" value="" />
-
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="form_text">Loket</label>
-                            <select class="form-control" id="form_status" name="loket" id="loket_search">
+                            <select class="form-control" name="id_court_room" id="loket_search">
                                 <option selected value="">Pilih...</option>
                                 @for(v <- courtRoomList) {
                                     <option value="@v.courtRoom.id">@v.courtRoom.name ( @v.courtRoom.description )</option>
@@ -118,17 +132,19 @@
                         </div>
                         <div class="form-group">
                             <label for="form_status">Status Terpanggil</label>
-                            <select class="form-control" id="form_status" name="status" id="status_search">
+                            <select class="form-control" name="status" id="status_search">
                                 <option selected value="">Semua...</option>
-                                <option value="1">Sudah</option>
-                                <option value="0">Belum</option>
+                                <option value=1>Sudah</option>
+                                <option value=0>Belum</option>
                             </select>
                         </div>
+                        <input type="hidden" name="start_date" id="start_search"/>
+                        <input type="hidden" name="end_date" id="end_search"/>
                     </div>
                 </form>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Batal</button>
-                    <button type="submit" class="btn btn-primary" onclick="saveData()"><i class="fa fa-save"></i> Simpan</button>
+                    <button type="submit" class="btn btn-primary" onclick="searchData()"><i class="fa fa-save"></i> Simpan</button>
                 </div>
             </div>
         </div>
@@ -139,57 +155,82 @@
     $(document).ready(function() {
         //hit api get list
         $('#page').val(1)
-        getQueueList(1);
-
-        $('#btn_search').click(function() {
-            $('#modal_search').modal('show');
-        });
-
+        
         $('input[name="tanggal"]').daterangepicker({
             opens: 'left',
             locale: {
                 format: 'DD/MM/YYYY',
             }
         }, function(start, end, label) {
-            console.log("A new date selection was made: " + start.format('DD-MM-YYYY') + ' to ' + end.format('DD-MM-YYYY'));
+            $('#start_search').val(start.format('YYYY-MM-DD'));
+            $('#end_search').val(end.format('YYYY-MM-DD'));
         });
+
+        $('#start_search').val(dateNowFormat());
+        $('#end_search').val(dateNowFormat());
+
+        getQueueList(1);
+
+        $('#btn_search').click(function() {
+            $('#modal_search').modal('show');
+        });
+
+        $('#btn_reload').click(function() {
+            reload();
+        });
+
+
     });
 
+    function searchData() {
+        $('#modal_search').modal('hide');
+        getQueueList(1);
+    }
+
     function getQueueList(page){
-      $('#loading_queue_list').show();
+        showLoading();
 
       $.ajax({
           type: 'GET',
           url: 'api/queue/list/'+page,
-          data:{
-              active: ""
-          },
+          data: '&start_date='+$('#start_search').val()+'&end_date='+$('#end_search').val(),
+          data: $('#form_search').serialize(),
           cache: true,
           success: function(res){
-              $('#court_room_list').empty();
-              $('#loading_queue_list').hide();
-              $('#pagination').html(pagination(res.total, res.limit, res.page, 1));
-              $('#page_summary').html(page_summary(res.total, res.data.length, res.limit, res.page));
-              let str='';
-              $.each(res.data, function(i,v){
-                  str += `
-                      <tr>
-                        <td>${numbList(i, res.page, res.limit)}</td>
-                        <td class="text-center">${datetime2date(timemilisFormat(v.date, false))}</td>
-                        <td class="text-center">${v.queue_number}</td>
-                        <td class="text-center">${v.court_room?.name}
-                        <td class="text-center">${v.court_room?.description}
-                            <td class="text-center">${timemilisFormat(v.pick_up_time, true)}</td>
-                            <td class="text-center">${v.status == 0 ? '-' : timemilisFormat(v.call_time, true)}</td>
-                        <td class="text-center">
-                            <span class="right badge badge-${v.status ? "success":"secondary"}">
-                                    ${v.status ? "Sudah ":"Belum "} Terpanggil
-                            </span>
-                        </td>
-                      </tr>
-                  `
-              })
-              $('#court_room_list').html(str);
+              hideLoading();
+            
+              if(res == undefined){
+                $('#pagination').html(pagination(0, 10, 1, 1));
+                $('#page_summary').html(page_summary(0, 0, 10, 1));
+                $('#court_room_list').html('');
+
+              } else {
+                $('#court_room_list').empty();
+                $('#loading_queue_list').hide();
+                $('#pagination').html(pagination(res.total, res.limit, res.page, 1));
+                $('#page_summary').html(page_summary(res.total, res.data.length, res.limit, res.page));
+                let str='';
+                $.each(res.data, function(i,v){
+                    str += `
+                        <tr>
+                            <td>${numbList(i, res.page, res.limit)}</td>
+                            <td class="text-center">${datetime2date(timemilisFormat(v.date, false))}</td>
+                            <td class="text-center">${v.queue_number}</td>
+                            <td class="text-center">${v.court_room?.name}
+                            <td class="text-center">${v.court_room?.description}
+                                <td class="text-center">${timemilisFormat(v.pick_up_time, true)}</td>
+                                <td class="text-center">${v.status == 0 ? '-' : timemilisFormat(v.call_time, true)}</td>
+                            <td class="text-center">
+                                <span class="right badge badge-${v.status ? "success":"secondary"}">
+                                        ${v.status ? "Sudah ":"Belum "} Terpanggil
+                                </span>
+                            </td>
+                        </tr>
+                    `
+                })
+                $('#court_room_list').html(str);
+              }
+              
           },
           error: function(e){
               Swal.fire({
@@ -206,7 +247,32 @@
     }
 
     function reload(){
+        $('#loket_search, #status_search').val('');
+        $('#start_search').val(dateNowFormat());
+        $('#end_search').val(dateNowFormat());
+
         getQueueList(1);
+    }
+
+    function dateNowFormat() {
+      let today = new Date();
+      var yyyy = today.getFullYear().toString();
+      var mm = (today.getMonth()+1).toString();
+      var dd  = today.getDate().toString();
+
+      var mmChars = mm.split('');
+      var ddChars = dd.split('');
+
+      return yyyy + '-' + (mmChars[1]?mm:"0"+mmChars[0]) + '-' + (ddChars[1]?dd:"0"+ddChars[0]);
+    }
+
+    function showLoading() {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+        // Fungsi untuk menyembunyikan loading overlay
+    function hideLoading() {
+        document.getElementById('loadingOverlay').style.display = 'none';
     }
 </script>
 

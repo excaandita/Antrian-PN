@@ -87,8 +87,8 @@ class QueueData @Inject()(
         |WHERE q.id IS NOT NULL
         |""".stripMargin
 
-    val count = "SELECT COUNT(*) FROM queue "
-    val total = SQL(count ).as(scalar[Long].single)
+    val count = "SELECT COUNT(*) FROM queue q WHERE q.id IS NOT NULL "
+    val total = SQL(count + q).as(scalar[Long].single)
 
     val list = SQL(query + q + order + limitation).as(QueueParser.queueJoinParser.*)
 
