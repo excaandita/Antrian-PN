@@ -1,4 +1,38 @@
+<style>
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.171);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .loading-spinner {
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
 <div class="content-wrapper">
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
     <!-- Content Header (Page header) -->
     <div class="content-header">
       <div class="container-fluid">
@@ -30,12 +64,8 @@
               <div class="card">
                   <div class="card-header d-flex justify-content-between">
                       <div class="input-group justify-content-start">
-                          <button type="button" class="btn btn-primary mr-2"><i class="fas fa-plus"></i> &nbsp;Tambah</button>
-  
-                          <button type="button" class="btn btn-default "><i class="fas fa-sync"></i> &nbsp;Reload</button>
-                      </div>
-                      <div class="input-group justify-content-end">
-                          <input type="text" class="form-control col-lg-4" placeholder="Search">
+                          <button type="button" class="btn btn-primary mr-2" id="btn_add_video"><i class="fas fa-plus"></i> &nbsp;Tambah</button>
+                          <button type="button" class="btn btn-default " id="btn_reload"><i class="fas fa-sync"></i> &nbsp;Reload</button>
                       </div>
                   </div>
                   
@@ -44,77 +74,19 @@
                           <thead>
                               <tr>
                                   <th style="width: 5%">No</th>
-                                  <th align="center">Text</th>
+                                  <th align="center">Keterangan</th>
+                                  <th align="center">Path</th>
                                   <th align="center">Status</th>
-                                  <th style="width: 8%">Action</th>
+                                  <th align="right" style="width: 8%">Aksi</th>
                               </tr>
                           </thead>
-                          <tbody>
-                              <tr>
-                                  <td>1.</td>
-                                  <td>Update software</td>
-                                  <td>
-                                      <div class="progress progress-xs">
-                                          <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
-                                      </div>
-                                  </td>
-                                  <td>
-                                      <button type="button" class="btn btn-success btn-xs mr-1"><i class="fas fa-pen"></i></button>
-                                      <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash"></i></button>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>2.</td>
-                                  <td>Clean database</td>
-                                  <td>
-                                      <div class="progress progress-xs">
-                                          <div class="progress-bar bg-warning" style="width: 70%"></div>
-                                      </div>
-                                  </td>
-                                  <td>
-                                      <button type="button" class="btn btn-success btn-xs mr-1"><i class="fas fa-pen"></i></button>
-                                      <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash"></i></button>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>3.</td>
-                                  <td>Cron job running</td>
-                                  <td>
-                                      <div class="progress progress-xs progress-striped active">
-                                          <div class="progress-bar bg-primary" style="width: 30%"></div>
-                                      </div>
-                                  </td>
-                                  <td>
-                                      <button type="button" class="btn btn-success btn-xs mr-1"><i class="fas fa-pen"></i></button>
-                                      <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash"></i></button>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>4.</td>
-                                  <td>Fix and squish bugs</td>
-                                  <td>
-                                      <div class="progress progress-xs progress-striped active">
-                                          <div class="progress-bar bg-success" style="width: 90%"></div>
-                                      </div>
-                                  </td>
-                                  <td>
-                                      <button type="button" class="btn btn-success btn-xs mr-1"><i class="fas fa-pen"></i></button>
-                                      <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash"></i></button>
-                                  </td>
-                              </tr>
+                          <tbody id="video_list">
                           </tbody>
                       </table>
                   </div>
   
                   <div class="card-footer clearfix">
                       <hr>
-                      <ul class="pagination pagination-sm m-0 float-right">
-                          <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                          <li class="page-item"><a class="page-link" href="#">1</a></li>
-                          <li class="page-item"><a class="page-link" href="#">2</a></li>
-                          <li class="page-item"><a class="page-link" href="#">3</a></li>
-                          <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-                      </ul>
                   </div>
               </section>
           </div>
@@ -122,5 +94,239 @@
       <!-- /.container-fluid -->
     </section>
     <!-- /.content -->
+
+    <div class="modal" tabindex="-1" id="modal_add_video">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Video</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="formadd_video" class="form-horizontal form-label-left">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="id" value="" class="inputfield form-control" /> 
+
+                        <div class="form-group">
+                            <label for="form_text">Keterangan</label>
+                            <input type="text" name="name" class="form-control" id="name"></input>
+                        </div>
+                        <div class="form-group">
+                            <label for="form_text">Path</label>
+                            <input type="text" name="path" class="form-control" id="path"></input>
+                        </div>
+                        <div class="form-group">
+                            <label for="form_status">Status</label>
+                            <select class="form-control" id="status" name="status">
+                                <option selected value="1">Aktif</option>
+                                <option value="0">Tidak aktif</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Batal</button>
+                        <button type="submit" class="btn btn-primary" onclick="saveData()"><i class="fa fa-save"></i> Simpan</button>
+                    </div>
+            </div>
+        </div>
+    </div>
   </div>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+        getVideoList();
+
+        $('#btn_add_video').click(function(){
+            reset()
+            $('#modal_add_video').modal('show')
+        });
+    })
+
+    function showLoading() {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+        // Fungsi untuk menyembunyikan loading overlay
+    function hideLoading() {
+        document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    function reset(){
+        $('.form-control').val('');
+        $('#status').val('1');
+    }
+
+    function getVideoList(){
+        showLoading();
+
+        $.ajax({
+            type: 'GET',
+            url: 'api/video/list/0',
+            data:{
+                active: ""
+            },
+            cache: true,
+            success: function(res){
+                hideLoading();
+                let str='';
+                $.each(res.data, function(i,v){
+                    str += `
+                        <tr>
+                            <td>${i+1}</td>
+                            <td>${v.name}</td>
+                            <td>${v.path}</td>
+                            <td>
+                                <span class="right badge badge-${v.status ? "primary":"secondary"}">
+                                    ${v.status ? "Aktif":"Tidak Aktif"}
+                                </span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-success btn-xs mr-1" onclick="editData('${v.id}')"><i class="fas fa-pen"></i></button>
+                                <button type="button" class="btn btn-danger btn-xs" onclick="deleteData('${v.id}')"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `
+                })
+                $('#video_list').html(str);
+
+            },
+            error: function(e){
+                hideLoading();
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: e.responseText,
+                });
+            }
+        })
+    }
+
+    function saveData() {
+        showLoading();
+
+        //check id
+        let id = $('#id').val();
+
+        let action = 'POST';
+        let url = 'api/video/insert';
+
+        if(id != '') {
+            action = 'PUT';
+            url = 'api/video/update';
+        } 
+
+        //json data
+        let jsonData = {
+            'id': parseInt(id),
+            'name': $('#name').val(),
+            'path': $('#path').val(),
+            'status': parseInt($('#status').val()),
+        }
+
+        $.ajax({
+            type: action,
+            url: url,
+            data: JSON.stringify(jsonData),
+            cache: false,
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            success: function(res){
+                hideLoading();
+                $('#modal_add_video').modal('hide');
+
+                Swal.fire({
+                  icon: "success",
+                  title: "Berhasil Tambah",
+                  text: "Data Video Berhasil di Tambahkan / di Ubah!",
+                });
+                reset();
+                getVideoList();
+            },
+            error: function(e){
+                hideLoading();
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: e.responseText,
+                });
+            }
+        });
+    }
+
+    function editData(id) {
+        showLoading();
+        $.ajax({
+            type: 'GET',
+            url: '/api/video/get/'+id,
+            cache: true,
+            success: function(res){
+                hideLoading();
+
+                $('#id').val(res.data.id)
+                $('#name').val(res.data.name)
+                $('#path').val(res.data.path)
+                $('#status').val(res.data.status)
+
+                $('#modal_add_video').modal('show');
+                
+            },
+            error: function(e){
+                hideLoading();
+
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: e.responseText,
+                });
+            }
+        });
+    }
+
+    function deleteData(id){
+        //alert(id)
+        Swal.fire({
+          title: "Hapus?",
+          text: "Apakah anda yakin ingin menghapus",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Hapus"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            showLoading();
+
+            id = parseInt(id)
+            $.ajax({
+                type: 'DELETE',
+                url: 'api/video/delete',
+                data: JSON.stringify({"id": id}),
+                cache: false,
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                success: function(res){
+                    hideLoading();
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: "Your file has been deleted.",
+                        icon: "success"
+                    });
+                    reset();
+                    getVideoList();
+                },
+                error: function(e){
+                    hideLoading();
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e.responseText,
+                    });
+                }
+            });
+          }
+        });
+    }
+  </script>
   

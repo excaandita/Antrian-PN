@@ -24,6 +24,13 @@ GET     /cetak_antrian             controllers.HomeController.cetak()
 # Dashboard
 GET     /api/dashboard                      controllers.api.DashboardCon.get(date: String)
 
+# Video
+GET     /api/video/list/:p                  controllers.api.VideoCon.list(p: Int)
+GET     /api/video/get/:id                  controllers.api.VideoCon.get(id:Int)
+POST    /api/video/insert                   controllers.api.VideoCon.add()
+PUT     /api/video/update                   controllers.api.VideoCon.put()
+DELETE  /api/video/delete                   controllers.api.VideoCon.remove()
+
 # Running Text
 GET     /api/running_text/list/:p           controllers.api.RunningTextCon.list(p: Int)
 GET     /api/running_text/get/:id           controllers.api.RunningTextCon.get(id:Int)

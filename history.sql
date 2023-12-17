@@ -37,3 +37,5 @@ CREATE TABLE `running_text` (
     `description` TEXT NOT NULL , 
     `status` ENUM('0','1') NOT NULL , 
 PRIMARY KEY (`id`), INDEX (`status`)) ENGINE = InnoDB;
+
+ALTER TABLE `video` ADD `status` TINYINT(4) NOT NULL DEFAULT '1' AFTER `path`;
