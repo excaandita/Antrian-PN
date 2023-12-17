@@ -114,7 +114,7 @@
                         </div>
                         <div class="form-group">
                             <label for="form_text">Path</label>
-                            <input type="text" name="path" class="form-control" id="path"></input>
+                            <input type="file" name="video" class="form-control-file" id="video" accept="video/*" />
                         </div>
                         <div class="form-group">
                             <label for="form_status">Status</label>
@@ -218,20 +218,21 @@
         } 
 
         //json data
-        let jsonData = {
-            'id': parseInt(id),
-            'name': $('#name').val(),
-            'path': $('#path').val(),
-            'status': parseInt($('#status').val()),
-        }
+        var formData = new FormData();
+        formData.append('id', parseInt(id));
+        formData.append('name', $('#name').val());
+        formData.append('status', parseInt($('#status').val()));
+        formData.append('video', $('#video')[0].files[0]);
+
 
         $.ajax({
             type: action,
             url: url,
-            data: JSON.stringify(jsonData),
+            data: formData,
+            processData: false,
+            contentType: false,
             cache: false,
             dataType: 'json',
-            contentType: "application/json; charset=utf-8",
             success: function(res){
                 hideLoading();
                 $('#modal_add_video').modal('hide');
