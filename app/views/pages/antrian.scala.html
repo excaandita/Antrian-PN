@@ -157,12 +157,14 @@
         $('#id_court_room').val(storage_courtRoom)
         $('#id_court_room_manual').val(storage_courtRoomManual)
 
+        getQueuePanggilV2($('#id_court_room').val());
+        getQueuePanggilManual($('#id_court_room_manual').val());
        
         $('#id_court_room').change(function(){
             let id = $('#id_court_room').val();
             localStorage.setItem("courtRoom", id);
             
-            getQueuePanggil(id);
+            getQueuePanggilV2(id);
         });
 
         $('#id_court_room_manual').change(function(){
@@ -176,7 +178,7 @@
 
     function reloadAntrian() {
         let id = $('#id_court_room').val();
-        getQueuePanggil(id);
+        getQueuePanggilV2(id);
     }
 
     function panggilManual() {
@@ -195,6 +197,42 @@
             $('#no_antri_manual').val('');
         }
 
+    }
+
+    function getQueuePanggilV2(id) {
+        $.ajax({
+            type: 'GET',
+            url: 'api/queue/queue_number?id_court_room='+id,
+            cache: true,
+            success: function(res){
+                console.log(res);
+                
+                $('#nomor_antrian').html(res.data.queue_number)
+
+                manageButtonPanggilV2(res.data.queue_number-1 , res.data.queue_number, res.data.queue_number+1, id);
+                
+            },
+            error: function(e){
+                if(e.data == undefined){
+                    Swal.fire({
+                        icon: "info",
+                        title: "Oops...",
+                        text: "Antrian Tidak Ada!!",
+                    });
+
+                    manageButtonPanggilV2(0, 0, 1, id);
+                    $('#nomor_antrian').html('0')
+
+                } else {
+            
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e.responseText,
+                    });
+                }
+            }
+        })
     }
 
     function getQueuePanggil(id){
@@ -252,7 +290,6 @@
                         text: "Antrian Tidak Ada!!",
                     });
 
-                    manageButtonPanggil(null, null, null);
                     $('#total_antrian_manual').val('0')
 
                 } else {
@@ -271,6 +308,12 @@
         $('#button_antrian_sebelumnya').html('<button type="button" class="btn btn-danger form-control" id="button_antrian_sebelumnya" onClick="return panggilAntrian('+idQueuePrev+')"><i class="fas fa-backward"></i>&nbsp; Sebelumnya</button>')
         $('#button_antrian_sekarang').html('<button type="button" class="btn btn-warning form-control"  id="button_antrian_sekarang" onClick="return panggilAntrian('+idQueueNow+')"><i class="fas fa-pause-circle"></i>&nbsp; Sekarang</button>')
         $('#button_antrian_selanjutnya').html('<button type="button" class="btn btn-info form-control" id="button_antrian_selanjutnya" onClick="return panggilAntrian('+idQueueNext+')">Selanjutnya &nbsp;<i class="fas fa-forward"></i></button>')
+    }
+
+    function manageButtonPanggilV2(idQueuePrev, idQueueNow, idQueueNext, idCourtRoom) {
+        $('#button_antrian_sebelumnya').html('<button type="button" class="btn btn-danger form-control" id="button_antrian_sebelumnya" onClick="return panggilAntrianV2('+idQueuePrev+','+idCourtRoom+')"><i class="fas fa-backward"></i>&nbsp; Sebelumnya</button>')
+        $('#button_antrian_sekarang').html('<button type="button" class="btn btn-warning form-control"  id="button_antrian_sekarang" onClick="return panggilAntrianV2('+idQueueNow+','+idCourtRoom+')"><i class="fas fa-pause-circle"></i>&nbsp; Sekarang</button>')
+        $('#button_antrian_selanjutnya').html('<button type="button" class="btn btn-info form-control" id="button_antrian_selanjutnya" onClick="return panggilAntrianV2('+idQueueNext+','+idCourtRoom+')">Selanjutnya &nbsp;<i class="fas fa-forward"></i></button>')
     }
 
     function panggilAntrian(id){
@@ -345,6 +388,116 @@
                 }
             }
         })
+    }
+
+    function panggilAntrianV2(number, idCourtRoom) {
+        console.log(number < 0 && idCourtRoom == null)
+        if(number < 0 && idCourtRoom == null){ 
+            Swal.fire({
+                icon: "info",
+                title: "Oops...",
+                text: "Tidak ada antrian berikutnya...",
+            });
+
+            return false;
+        }
+
+        $.ajax({
+            type: 'GET',
+            url: 'api/queue/get_by_param',
+            data: '&id_court_room='+idCourtRoom+'&queue_number='+number,
+            cache: true,
+            success: function(res){
+                console.log(res)
+
+                if(res.data.id == null) {
+                    Swal.fire({
+                        icon: "info",
+                        title: "Oops...",
+                        text: "Tidak ada antrian berikutnya...",
+                    });
+
+                    return false;
+                }
+
+                let jsonData = {
+                    'id_queue': parseInt(res.data.id)
+                }
+
+                $.ajax({
+                    type: 'PUT',
+                    url: 'api/queue/call_queue',
+                    data: JSON.stringify(jsonData),
+                    cache: true,
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    success: function(res){
+                        console.log(res);
+                        
+                        $('#nomor_antrian').html(res.data.queue)
+                        manageButtonPanggilV2(res.data.queue-1, res.data.queue, res.data.queue+1, res.data.court_room.id);
+                        
+                        let jsonPush = {
+                            'no_antri': parseInt(res.data.queue),
+                            'file_sound': res.data.court_room.file_sound,
+                            'id_court_room': res.data.court_room.id,
+                            'loket': res.data.court_room.name,
+                            'panggil': 'ya',
+                        }
+
+                        $.ajax({
+                            type: 'POST',
+                            url: 'queue/push_display',
+                            data: JSON.stringify(jsonPush),
+                            cache: true,
+                            dataType: 'json',
+                            contentType: "application/json; charset=utf-8",
+                            complete: function(xhr, status) {
+                            console.log(status)
+                                $(document).Toasts('create', {
+                                    title: 'Berhasil!!',
+                                    class: 'bg-success',
+                                    autohide: true,
+                                    delay: 1000,
+                                    body: 'Antrian : '+res.data.queue+' Berhasil Terpanggil'
+                                })
+                            }
+                        })
+                        
+                    },
+                    error: function(e){
+                        if(e.data == undefined){
+                            Swal.fire({
+                                icon: "info",
+                                title: "Oops...",
+                                text: "Antrian Tidak Ada!!",
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: e.responseText,
+                            });
+                        }
+                    }
+                })
+            },
+            error: function(e){
+                if(e.data == undefined){
+                    Swal.fire({
+                        icon: "info",
+                        title: "Oops...",
+                        text: "Antrian Tidak Ada!!",
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e.responseText,
+                    });
+                }
+            }
+        });
     }
 
     function panggilAntrianManual(idCourtRoom, number){
