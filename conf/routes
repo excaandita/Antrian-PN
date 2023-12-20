@@ -61,7 +61,7 @@ POST   	/queue/push_display					controllers.api.QueueRoomDisplayCon.pushMessage
 
 # Speech 
 GET 	/api/speech/audio/:file 		    controllers.api.SpeechCon.getAudioFile(file: String)
-
+GET 	/api/speech/video/:file 		    controllers.api.SpeechCon.getVideoFile(file: String)
 
 
 # Map static resources from the /public folder to the /assets URL path

@@ -1,6 +1,6 @@
 @import controllers.transactions.DisplayCourt
-@(runningTextList: List[RunningText], courtRoomList: List[DisplayCourt])
-
+@import play.api.libs.json.Json
+@(runningTextList: List[RunningText], courtRoomList: List[DisplayCourt], videoList: List[Video])
 
 <!DOCTYPE html>
 <html lang="en">
@@ -190,14 +190,14 @@
         }
 
         .logo-size{
-            width: 3rem;
+            width: 4rem;
             margin: 0 8px;
         }
 
         .title-size{
             /*width: 60%;*/
             font-weight: 1000;
-            font-size: 1.7rem;
+            font-size: 2.2rem;
         }
 
         .card-body-flex{
@@ -219,13 +219,13 @@
             }
 
             .logo-size{
-                width: 6.0rem;
+                width: 7.0rem;
                 margin: 0 8px;
             }
 
             .title-size{
                 font-weight: 1000;
-                font-size: 2.3rem;
+                font-size: 2.8rem;
             }
 
             .tanggal_terkini {
@@ -274,13 +274,13 @@
         }
         @@media screen and (min-width: 2560px){
             .logo-size{
-                width: 9rem;
+                width: 10rem;
                 margin: 0 8px;
             }
 
             .title-size{
-                font-weight: 1000;
-                font-size: 5rem;
+                font-weight: bold;
+                font-size: 6rem;
             }
 
             .tanggal_terkini {
@@ -335,10 +335,10 @@
             <!-- Navbar -->
             <nav class="navbar d-flex justify-content-between align-item-center py-2 py-xxl-3">
                 <!-- Logo and Company -->
-                <div class="col-md-7 col-xl-6 col-xxl-4">
+                <div class="col-md-8 col-xl-7 col-xxl-12">
                     <div class="logo-header d-flex align-items-center">
                         <img src="@routes.Assets.versioned("images/logo_pn.png")" class="logo-size" alt="logo">
-                        <span class="text-uppercase font-primary title-size" onclick="openModalCluster()">Pengadilan Negeri<br> Jakarta Utara</span>
+                        <span class="text-uppercase font-primary title-size" onclick="openModalCluster()">Pengadilan Negeri Jakarta Utara</span>
                     </div>
                 </div>
                 <!-- datetime Clock -->
@@ -355,8 +355,8 @@
                     <!-- Video -->
                     <div class="col-lg-7">
                         <div class="box-video" style="">
-                            <video width="100%" autoplay loop muted style="border-radius: 10px; box-shadow: 6px 4px 4px 0px rgba(0, 0, 0, 0.25);">
-                                <source src="@routes.Assets.versioned("video/video_monitor.mp4")" type="video/mp4">
+                            <video id="myVideos" width="100%" autoplay muted style="border-radius: 10px; box-shadow: 6px 4px 4px 0px rgba(0, 0, 0, 0.25);">
+                                
                             </video>
                         </div>
                     </div>
@@ -433,6 +433,12 @@
         var static_queue = new Queue(); 
         var nyala = false;
         var isAntri = true;
+
+        var videoSource = new Array();
+        var videoSource = @Html(Json.toJson(videoList.map(v => v.path)).toString);
+        
+        var videoCount = videoSource.length;
+        var i = 0;
 
         var templatePlugins = function(){
             var tp_clock = function(){
@@ -532,7 +538,23 @@
                 });
             });
 
+            $("#myVideos").attr("src", "/api/speech/video/"+videoSource[0]);
+            document.getElementById('myVideos').addEventListener('ended', function(e) {
+                i++;
+                if (i == videoCount) {
+                    i = 0;
+                    videoPlay(i);
+                } else {
+                    videoPlay(i);
+                }
+            }, false);
         });
+
+        function videoPlay(videoNum) {
+            document.getElementById("myVideos").setAttribute("src", "/api/speech/video/"+videoSource[videoNum]);
+            document.getElementById("myVideos").load();
+            document.getElementById("myVideos").play();
+        }
 
         function openModalCluster() {
             $('#modal_cluster').modal('show');

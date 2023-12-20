@@ -1,7 +1,7 @@
 package controllers
 
 import controllers.transactions.{DisplayCourt, DisplayTrx, KioskTrx}
-import models.{QueueData, RunningText, RunningTextData}
+import models.{QueueData, RunningText, RunningTextData, Video, VideoData}
 import play.api._
 import play.api.mvc._
 import utils.{Helpers, ListResult, ResponseService => Res}
@@ -17,7 +17,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
                                runningTextData: RunningTextData,
                                kioskTrx: KioskTrx,
                                queueData: QueueData,
-                               displayTrx: DisplayTrx
+                               displayTrx: DisplayTrx,
+                               videoData: VideoData
                                ) extends BaseController {
   import queueData.{queueFormat, queueJoinFormat}
   /**
@@ -67,8 +68,9 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents,
   def display(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     val running_text_list: List[RunningText] = runningTextData.list().items
     val court_room_list: List[DisplayCourt] = displayTrx.list()
+    val video_list: List[Video] = videoData.list().items
 
-    Ok(views.html.boards.display(running_text_list, court_room_list))
+    Ok(views.html.boards.display(running_text_list, court_room_list, video_list))
   }
 
   def cetak(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>

@@ -22,9 +22,12 @@ class SpeechCon @Inject()(config: Configuration,
         
         Ok.sendFile(new File(path))
     }
+    
+    def getVideoFile(videoFile: String) = Action { implicit request: Request[AnyContent] =>
+        val videoDir: String = config.get[String]("app.videoDir")
+        val path: String = s"${videoDir}/${videoFile}"
 
-
-
-   
+        Ok.sendFile(new File(path))
+    }
   // End of Class
 }
